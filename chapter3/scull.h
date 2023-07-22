@@ -18,8 +18,8 @@
  *
  * The array (quantum-set) is SCULL_QSET long.
  */
-#ifndef SCULL_QUNTUM
-#define SCULL_QUNTUM 4000
+#ifndef SCULL_QUANTUM
+#define SCULL_QUANTUM 4000
 #endif
 
 #ifndef SCULL_QSET
