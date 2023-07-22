@@ -1,0 +1,12 @@
+# dir should be ignored
+
+# files should be ignored
+*.ko
+*.o
+*.mod
+*.mod.c
+*.cmd
+*.tmp
+*.swp
+*.order
+*.symvers
