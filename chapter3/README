@@ -1,0 +1,5 @@
+1. currently, scull.c will not make device node. After insmod scull.ko,
+you will not find /dev/scullx. Instead, you can use scull_load script 
+to insmod the scull.ko, get the major number and make the device node.
+
+please refer to "Dynamic Allocation of Major Numbers" of chapter 3.
