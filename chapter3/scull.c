@@ -10,7 +10,12 @@
 #include <linux/fcntl.h>    /* O_ACCMODE */
 #include <linux/cdev.h>
 
-#include <asm/uaccess.h>    /* copy_*_user */
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
+    #include <asm/uaccess.h>    /* copy_*_user */
+#else
+    #include <linux/uaccess.h>    /* copy_*_user */
+#endif
 
 #include "scull.h"
 
