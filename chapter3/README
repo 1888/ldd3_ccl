@@ -2,4 +2,12 @@
 you will not find /dev/scullx. Instead, you can use scull_load script 
 to insmod the scull.ko, get the major number and make the device node.
 
+examples:
+	1. sudo ./scull_load.sh
+	2. cat /proc/devices | grep scull
+	3. ls -al /dev/scull*
+	4. sudo ./scull_unload.sh
+	5. cat /proc/devices | grep scull
+	6. ls -al /dev/scull*
+
 please refer to "Dynamic Allocation of Major Numbers" of chapter 3.

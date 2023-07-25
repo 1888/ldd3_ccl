@@ -10,3 +10,4 @@
 *.swp
 *.order
 *.symvers
+*.cache.mk
