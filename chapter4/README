@@ -1,0 +1,79 @@
+1. currently, scull.c will not make device node. After insmod scull.ko,
+you will not find /dev/scullx. Instead, you can use scull_load script 
+to insmod the scull.ko, get the major number and make the device node.
+
+examples:
+	1. sudo ./scull_load.sh
+	2. cat /proc/devices | grep scull
+	3. ls -al /dev/scull*
+	4. sudo ./scull_unload.sh
+	5. cat /proc/devices | grep scull
+	6. ls -al /dev/scull*
+
+please refer to "Dynamic Allocation of Major Numbers" of chapter 3.
+
+2. testing
+	
+============step1 
+you may find you cannot echo something to /dev/scull*, due to you 
+are not in the group.
+
+cityday@ubuntu:/dev$ ls -al scull*
+crw-rw-r-- 1 root staff 243, 0 Jul 25 22:10 scull0
+crw-rw-r-- 1 root staff 243, 1 Jul 25 22:10 scull1
+crw-rw-r-- 1 root staff 243, 2 Jul 25 22:10 scull2
+crw-rw-r-- 1 root staff 243, 3 Jul 25 22:10 scull3
+
+cityday@ubuntu:/dev$ sudo echo 1234 > scull0
+-bash: scull0: Permission denied
+
+cityday@ubuntu:/dev$ cat /etc/group | grep cityday
+adm:x:4:syslog,cityday
+cdrom:x:24:cityday
+sudo:x:27:cityday
+dip:x:30:cityday
+plugdev:x:46:cityday
+lpadmin:x:113:cityday
+cityday:x:1000:
+sambashare:x:128:cityday
+
+==============step2
+you can add your acount into the staff group.
+
+cityday@ubuntu:/dev$ sudo usermod -a -G adm,cdrom,sudo,dip,plugdev,lpadmin,sambashare,staff cityday
+cityday@ubuntu:/dev$ cat /etc/group | grep cityday
+adm:x:4:syslog,cityday
+cdrom:x:24:cityday
+sudo:x:27:cityday
+dip:x:30:cityday
+plugdev:x:46:cityday
+staff:x:50:cityday
+lpadmin:x:113:cityday
+cityday:x:1000:
+sambashare:x:128:cityday
+
+=============step3
+you may find you still cannot write to the /dev/scull*, that because your login account still not blong to
+staff group. you should logout. then login again.
+
+cityday@ubuntu:/dev$ groups
+cityday adm cdrom sudo dip plugdev lpadmin sambashare
+cityday@ubuntu:/dev$ logout
+
+=============step4.
+now, your account blongs to staff group. you can write/read the /dev/scull*.
+
+cityday@ubuntu:~$ groups
+cityday adm cdrom sudo dip plugdev staff lpadmin sambashare
+cityday@ubuntu:~$
+cityday@ubuntu:~$
+cityday@ubuntu:~$ ls /dev/scull* -al
+crw-rw-r-- 1 root staff 243, 0 Jul 25 22:49 /dev/scull0
+crw-rw-r-- 1 root staff 243, 1 Jul 25 22:49 /dev/scull1
+crw-rw-r-- 1 root staff 243, 2 Jul 25 22:49 /dev/scull2
+crw-rw-r-- 1 root staff 243, 3 Jul 25 22:49 /dev/scull3
+cityday@ubuntu:~$ echo 1234 > /dev/scull0
+cityday@ubuntu:~$ cat /dev/scull0
+1234
+
+
