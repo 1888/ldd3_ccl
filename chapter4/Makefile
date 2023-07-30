@@ -1,4 +1,3 @@
-
 # To build modules outside of the kernel tree, we run "make"
 # in the kernel source tree; the Makefile these then includes this
 # Makefile once again.
@@ -12,7 +11,21 @@ ifeq ($(KERNELRELEASE),)
     # The current directory is passed to sub-makes as argument
     PWD := $(shell pwd)
 
+	# Comment/uncomment the following line to disable/enable debugging
+	DEBUG = y
+
+	# Add your debugging flag (or not) to CFLAGS
+ifeq ($(DEBUG),y)
+	#DEBFLAGS = -O -save-temps -g -DSCULL_DEBUG # "-O" is needed to expand inlines
+	DEBFLAGS = -O -g -DSCULL_DEBUG # "-O" is needed to expand inlines
+else
+	DEBFLAGS = -O2
+endif
+
+ccflags-y += $(DEBFLAGS)
+
 modules:
+	echo $(ccflags-y)
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
 
 modules_install:
