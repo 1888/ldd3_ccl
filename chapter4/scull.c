@@ -7,6 +7,7 @@
 #include <linux/fs.h>       /* register_chrdev_region */
 #include <linux/errno.h>    /* error codes */
 #include <linux/types.h>    /* size_t */
+#include <linux/proc_fs.h>  /* proc file */
 #include <linux/fcntl.h>    /* O_ACCMODE */
 #include <linux/cdev.h>
 
@@ -67,6 +68,50 @@ int scull_trim(struct scull_dev *dev)
     dev->data = NULL;
     return 0;
 }
+
+#ifdef SCULL_DEBUG
+int scull_read_procmem(char* buf, char** start, off_t offset,
+        int count, int *eof, void *data)
+{
+    int i,j,len=0;
+    int limit = count - 80; /* Don't print more than this */
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+        struct scull_dev *d = &scull_devices[i];
+        struct scull_qset *qs = d->data;
+        if (mutex_lock_interruptible(&d->mutex))
+            return -ERESTARTSYS;
+
+        len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
+                i, d->qset, d->quantum, d->size);
+
+        for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+            len += sprintf(buf+len, " item at %p, qset at %p\n",
+                    qs, qs->data);
+            if (qs->data && !qs->next) /* dump only the last item */
+                for (j = 0; j < d->qset; j++) {
+                    if (qs->data[j])
+                        len += sprintf(buf + len, "\t%4i:%8p\n",
+                               j, qs->data[j]);
+                }
+        } 
+        mutex_unlock(&d->mutex);
+    }
+    *eof = 1;
+    return len;
+}
+
+static void scull_create_proc(void)
+{
+    struct proc_dir_entry * proc_scullmem = NULL;
+
+    proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
+                        NULL /* parent dir */, scull_read_procmem,
+                        NULL /* client data */);
+    if(!proc_scullmem)
+        printk(KERN_ERR "create scullmem failed!\n");
+}
+#endif
 
 /*
  * Open and Close
@@ -252,6 +297,9 @@ void scull_cleanup_module(void)
         }
         kfree(scull_devices);
     }
+#ifdef SCULL_DEBUG
+    remove_proc_entry("scullmem", NULL /* parent dir */);
+#endif
 
     /* cleanup_module is never called if registering failed */
     unregister_chrdev_region(devno, scull_nr_devs);
@@ -312,6 +360,10 @@ int scull_init_module(void)
         scull_setup_cdev(&scull_devices[i], i);
     }
  
+#ifdef SCULL_DEBUG
+    scull_create_proc();
+#endif
+
     PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, quantum %d, quantum set %d\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
     return 0;
 
