@@ -27,6 +27,7 @@
 #endif
 
 #undef PDEBUG   /* undef it, just in case */
+//#define SCULL_DEBUG
 #ifdef SCULL_DEBUG
 #ifdef __KERNEL__
     /* debugging is on in kernel space */

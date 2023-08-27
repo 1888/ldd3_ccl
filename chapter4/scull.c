@@ -312,7 +312,7 @@ int scull_init_module(void)
         scull_setup_cdev(&scull_devices[i], i);
     }
  
-    printk(KERN_INFO "scull: probe done, major %d, minor %d, scull_nr_devs %d, quantum %d, quantum set %d\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
+    PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, quantum %d, quantum set %d\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
     return 0;
 
 fail:

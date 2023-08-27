@@ -1,3 +1,21 @@
+# Comment/uncomment the following line to disable/enable debugging
+DEBUG = y
+
+# Add your debugging flag (or not) to CFLAGS
+ifeq ($(DEBUG),y)
+	DEBFLAGS = -o -g -DSCULL_DEBUG # "-o" is needed to expand inlines
+else
+	DEBFLAGS = -o2
+endif
+
+# CFLAGS was changed in "/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/Makefile". 
+# Fix it to use ccflags-y
+# actually use EXTRA_CFLAGS is also OK.
+# but there is a question: if put below line just before target modules, 
+# below line will not work. don't know why.
+ccflags-y += $(DEBFLAGS)
+#EXTRA_CFLAGS += $(DEBFLAGS)
+
 # To build modules outside of the kernel tree, we run "make"
 # in the kernel source tree; the Makefile these then includes this
 # Makefile once again.
@@ -11,21 +29,7 @@ ifeq ($(KERNELRELEASE),)
     # The current directory is passed to sub-makes as argument
     PWD := $(shell pwd)
 
-	# Comment/uncomment the following line to disable/enable debugging
-	DEBUG = y
-
-	# Add your debugging flag (or not) to CFLAGS
-ifeq ($(DEBUG),y)
-	#DEBFLAGS = -O -save-temps -g -DSCULL_DEBUG # "-O" is needed to expand inlines
-	DEBFLAGS = -O -g -DSCULL_DEBUG # "-O" is needed to expand inlines
-else
-	DEBFLAGS = -O2
-endif
-
-ccflags-y += $(DEBFLAGS)
-
 modules:
-	echo $(ccflags-y)
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
 
 modules_install:
