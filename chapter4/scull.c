@@ -384,12 +384,57 @@ out:
     return retval;
 }
 
+static void faulty_write(void)
+{
+    PDEBUG("this is oops test by scull ioctrl. not an issue.\n");
+    *(int*)0 = 0;
+}
+
+/*
+ *  bits    meaning
+ * dir: 31-30
+ *          00 - no parameters: uses _IO macro
+	        10 - read: _IOR
+	        01 - write: _IOW
+	        11 - read/write: _IOWR
+
+ * size: 29-16	size of arguments
+
+ * type: 15-8	ascii character supposedly
+	unique to each driver
+
+ * nr: 7-0	function #
+ *      ioctl cmd
+ * */
+long scull_ioctl(struct file *filp,
+        unsigned int cmd, unsigned long arg)
+{
+    int retval = 0;
+    if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
+        return -ENOTTY;
+
+    if (_IOC_NR(cmd) > SCULL_IOC_MAX)
+        return -ENOTTY;
+
+    PDEBUG("cmd 0x%08x.\n", cmd);
+    switch(cmd) {
+        case SCULL_IOC_MAKE_FAULTY_WRITE:
+            faulty_write();
+            break;
+
+        default:
+            PDEBUG("unknown cmd 0x%08x.\n", cmd);
+            break;
+    }
+
+    return retval;
+}
 struct file_operations scull_fops = {
 	.owner =    THIS_MODULE,
 //	.llseek =   scull_llseek,
 	.read =     scull_read,
 	.write =    scull_write,
-//	.unlocked_ioctl =    scull_ioctl,
+	.unlocked_ioctl =    scull_ioctl,
 	.open =     scull_open,
 	.release =  scull_release,
 };

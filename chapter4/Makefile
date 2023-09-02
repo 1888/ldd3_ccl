@@ -3,9 +3,9 @@ DEBUG = y
 
 # Add your debugging flag (or not) to CFLAGS
 ifeq ($(DEBUG),y)
-	DEBFLAGS = -o -g -DSCULL_DEBUG # "-o" is needed to expand inlines
+	DEBFLAGS = -O -g -DSCULL_DEBUG # "-O" is needed to expand inlines
 else
-	DEBFLAGS = -o2
+	DEBFLAGS = -O2
 endif
 
 # CFLAGS was changed in "/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/Makefile". 
@@ -28,15 +28,19 @@ ifeq ($(KERNELRELEASE),)
     KERNELDIR ?= /lib/modules/$(shell uname -r)/build
     # The current directory is passed to sub-makes as argument
     PWD := $(shell pwd)
+	INCLUDEDIR = $(KERNELDIR)/include
+	ccflags-y += -I$(INCLUDEDIR)
 
 modules:
+	echo $(ccflags-y)
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+	gcc scull_ioctl_app.c -o scull_ioctl_app
 
 modules_install:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
 
 clean:
-	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions Module.symvers modules.order .cache.mk 
+	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions Module.symvers modules.order .cache.mk scull_ioctl_app
 
 .PHONY: modules modules_install clean
 

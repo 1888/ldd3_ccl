@@ -1,0 +1,2165 @@
+
+scull.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 <scull_seq_start>:
+scull_seq_start():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:114
+ * the position is often interpreted as a cursor pointing to the next item in the sequence.
+ * The scull driver interprets each device as one item in the sequence,
+ * so the incoming pos is simply an index into the scull_devices array.
+ */ 
+static void *scull_seq_start(struct seq_file *s, loff_t *pos)
+{
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+   3:	83 ec 08             	sub    $0x8,%esp
+   6:	89 5d f8             	mov    %ebx,-0x8(%ebp)
+   9:	89 75 fc             	mov    %esi,-0x4(%ebp)
+   c:	e8 fc ff ff ff       	call   d <scull_seq_start+0xd>
+			d: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:115
+    if (*pos >= scull_nr_devs)
+  11:	8b 32                	mov    (%edx),%esi
+  13:	8b 4a 04             	mov    0x4(%edx),%ecx
+  16:	8b 1d 00 00 00 00    	mov    0x0,%ebx
+			18: R_386_32	scull_nr_devs
+  1c:	89 da                	mov    %ebx,%edx
+  1e:	c1 fa 1f             	sar    $0x1f,%edx
+  21:	39 d1                	cmp    %edx,%ecx
+  23:	7f 13                	jg     38 <scull_seq_start+0x38>
+  25:	7c 04                	jl     2b <scull_seq_start+0x2b>
+  27:	39 de                	cmp    %ebx,%esi
+  29:	73 0d                	jae    38 <scull_seq_start+0x38>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:117
+        return NULL; /* No more to read */
+    return scull_devices + *pos;
+  2b:	6b f6 64             	imul   $0x64,%esi,%esi
+  2e:	89 f0                	mov    %esi,%eax
+  30:	03 05 00 00 00 00    	add    0x0,%eax
+			32: R_386_32	scull_devices
+  36:	eb 05                	jmp    3d <scull_seq_start+0x3d>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:116
+ * so the incoming pos is simply an index into the scull_devices array.
+ */ 
+static void *scull_seq_start(struct seq_file *s, loff_t *pos)
+{
+    if (*pos >= scull_nr_devs)
+        return NULL; /* No more to read */
+  38:	b8 00 00 00 00       	mov    $0x0,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:118
+    return scull_devices + *pos;
+}
+  3d:	8b 5d f8             	mov    -0x8(%ebp),%ebx
+  40:	8b 75 fc             	mov    -0x4(%ebp),%esi
+  43:	89 ec                	mov    %ebp,%esp
+  45:	5d                   	pop    %ebp
+  46:	c3                   	ret    
+
+00000047 <scull_seq_next>:
+scull_seq_next():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:127
+ * pos is the current position in the file
+ * next should increment the value pointed to by pos
+ * depending on how your iterator works, you might (though probably won’t) want to increment pos by more than one.
+ */
+static void *scull_seq_next(struct seq_file *s, void *v, loff_t *pos)
+{
+  47:	55                   	push   %ebp
+  48:	89 e5                	mov    %esp,%ebp
+  4a:	83 ec 0c             	sub    $0xc,%esp
+  4d:	89 5d f4             	mov    %ebx,-0xc(%ebp)
+  50:	89 75 f8             	mov    %esi,-0x8(%ebp)
+  53:	89 7d fc             	mov    %edi,-0x4(%ebp)
+  56:	e8 fc ff ff ff       	call   57 <scull_seq_next+0x10>
+			57: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:128
+    (*pos)++;
+  5b:	8b 31                	mov    (%ecx),%esi
+  5d:	8b 79 04             	mov    0x4(%ecx),%edi
+  60:	83 c6 01             	add    $0x1,%esi
+  63:	83 d7 00             	adc    $0x0,%edi
+  66:	89 31                	mov    %esi,(%ecx)
+  68:	89 79 04             	mov    %edi,0x4(%ecx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:129
+    if (*pos >= scull_nr_devs)
+  6b:	a1 00 00 00 00       	mov    0x0,%eax
+			6c: R_386_32	scull_nr_devs
+  70:	89 c3                	mov    %eax,%ebx
+  72:	c1 fb 1f             	sar    $0x1f,%ebx
+  75:	39 df                	cmp    %ebx,%edi
+  77:	7f 11                	jg     8a <scull_seq_next+0x43>
+  79:	7c 04                	jl     7f <scull_seq_next+0x38>
+  7b:	39 c6                	cmp    %eax,%esi
+  7d:	73 0b                	jae    8a <scull_seq_next+0x43>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:131
+        return NULL;
+    return scull_devices + *pos;
+  7f:	6b f6 64             	imul   $0x64,%esi,%esi
+  82:	03 35 00 00 00 00    	add    0x0,%esi
+			84: R_386_32	scull_devices
+  88:	eb 05                	jmp    8f <scull_seq_next+0x48>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:130
+ */
+static void *scull_seq_next(struct seq_file *s, void *v, loff_t *pos)
+{
+    (*pos)++;
+    if (*pos >= scull_nr_devs)
+        return NULL;
+  8a:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:132
+    return scull_devices + *pos;
+}
+  8f:	89 f0                	mov    %esi,%eax
+  91:	8b 5d f4             	mov    -0xc(%ebp),%ebx
+  94:	8b 75 f8             	mov    -0x8(%ebp),%esi
+  97:	8b 7d fc             	mov    -0x4(%ebp),%edi
+  9a:	89 ec                	mov    %ebp,%esp
+  9c:	5d                   	pop    %ebp
+  9d:	c3                   	ret    
+
+0000009e <scull_seq_stop>:
+scull_seq_stop():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:138
+
+/* When the kernel is done with the iterator, it calls stop to clean up
+ * The scull implementation has no cleanup work to do, so its stop method is empty.
+ */
+static void scull_seq_stop(struct seq_file *s, void *v)
+{
+  9e:	55                   	push   %ebp
+  9f:	89 e5                	mov    %esp,%ebp
+  a1:	e8 fc ff ff ff       	call   a2 <scull_seq_stop+0x4>
+			a2: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:140
+	/* Actually, there's nothing to do here */
+}
+  a6:	5d                   	pop    %ebp
+  a7:	c3                   	ret    
+
+000000a8 <scull_release>:
+scull_release():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:252
+    }
+    return 0;
+}
+
+int scull_release (struct inode *inode, struct file *filp)
+{
+  a8:	55                   	push   %ebp
+  a9:	89 e5                	mov    %esp,%ebp
+  ab:	e8 fc ff ff ff       	call   ac <scull_release+0x4>
+			ac: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:254
+    return 0;
+}
+  b0:	b8 00 00 00 00       	mov    $0x0,%eax
+  b5:	5d                   	pop    %ebp
+  b6:	c3                   	ret    
+
+000000b7 <scull_ioctl>:
+scull_ioctl():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:411
+ * nr: 7-0	function #
+ *      ioctl cmd
+ * */
+long scull_ioctl(struct file *filp,
+        unsigned int cmd, unsigned long arg)
+{
+  b7:	55                   	push   %ebp
+  b8:	89 e5                	mov    %esp,%ebp
+  ba:	53                   	push   %ebx
+  bb:	83 ec 08             	sub    $0x8,%esp
+  be:	e8 fc ff ff ff       	call   bf <scull_ioctl+0x8>
+			bf: R_386_PC32	mcount
+  c3:	89 d3                	mov    %edx,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:413
+    int retval = 0;
+    if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
+  c5:	0f b6 d6             	movzbl %dh,%edx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:414
+        return -ENOTTY;
+  c8:	b8 e7 ff ff ff       	mov    $0xffffffe7,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:413
+ * */
+long scull_ioctl(struct file *filp,
+        unsigned int cmd, unsigned long arg)
+{
+    int retval = 0;
+    if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
+  cd:	83 fa 63             	cmp    $0x63,%edx
+  d0:	75 55                	jne    127 <scull_ioctl+0x70>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:416
+        return -ENOTTY;
+
+    if (_IOC_NR(cmd) > SCULL_IOC_MAX)
+  d2:	84 db                	test   %bl,%bl
+  d4:	75 4c                	jne    122 <scull_ioctl+0x6b>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:419
+        return -ENOTTY;
+
+    PDEBUG("cmd 0x%08x.\n", cmd);
+  d6:	89 5c 24 04          	mov    %ebx,0x4(%esp)
+  da:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+			dd: R_386_32	.rodata.str1.1
+  e1:	e8 fc ff ff ff       	call   e2 <scull_ioctl+0x2b>
+			e2: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:420
+    switch(cmd) {
+  e6:	81 fb 00 63 00 00    	cmp    $0x6300,%ebx
+  ec:	75 1d                	jne    10b <scull_ioctl+0x54>
+faulty_write():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:389
+    return retval;
+}
+
+static void faulty_write(void)
+{
+    PDEBUG("this is oops test by scull ioctrl. not an issue.\n");
+  ee:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+			f1: R_386_32	.rodata.str1.4
+  f5:	e8 fc ff ff ff       	call   f6 <scull_ioctl+0x3f>
+			f6: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:390
+    *(int*)0 = 0;
+  fa:	c7 05 00 00 00 00 00 	movl   $0x0,0x0
+ 101:	00 00 00 
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:430
+        default:
+            PDEBUG("unknown cmd 0x%08x.\n", cmd);
+            break;
+    }
+
+    return retval;
+ 104:	b8 00 00 00 00       	mov    $0x0,%eax
+ 109:	eb 1c                	jmp    127 <scull_ioctl+0x70>
+scull_ioctl():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:426
+        case SCULL_IOC_MAKE_FAULTY_WRITE:
+            faulty_write();
+            break;
+
+        default:
+            PDEBUG("unknown cmd 0x%08x.\n", cmd);
+ 10b:	89 5c 24 04          	mov    %ebx,0x4(%esp)
+ 10f:	c7 04 24 3c 00 00 00 	movl   $0x3c,(%esp)
+			112: R_386_32	.rodata.str1.4
+ 116:	e8 fc ff ff ff       	call   117 <scull_ioctl+0x60>
+			117: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:430
+            break;
+    }
+
+    return retval;
+ 11b:	b8 00 00 00 00       	mov    $0x0,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:427
+            faulty_write();
+            break;
+
+        default:
+            PDEBUG("unknown cmd 0x%08x.\n", cmd);
+            break;
+ 120:	eb 05                	jmp    127 <scull_ioctl+0x70>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:417
+    int retval = 0;
+    if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
+        return -ENOTTY;
+
+    if (_IOC_NR(cmd) > SCULL_IOC_MAX)
+        return -ENOTTY;
+ 122:	b8 e7 ff ff ff       	mov    $0xffffffe7,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:431
+            PDEBUG("unknown cmd 0x%08x.\n", cmd);
+            break;
+    }
+
+    return retval;
+}
+ 127:	83 c4 08             	add    $0x8,%esp
+ 12a:	5b                   	pop    %ebx
+ 12b:	5d                   	pop    %ebp
+ 12c:	c3                   	ret    
+
+0000012d <scull_proc_open>:
+scull_proc_open():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:185
+}; 
+
+/* create an open method that connects the file to the seq_file operations
+ * */
+static int scull_proc_open(struct inode *inode, struct file *file)
+{
+ 12d:	55                   	push   %ebp
+ 12e:	89 e5                	mov    %esp,%ebp
+ 130:	e8 fc ff ff ff       	call   131 <scull_proc_open+0x4>
+			131: R_386_PC32	mcount
+ 135:	89 d0                	mov    %edx,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:186
+    return seq_open(file, &scull_seq_ops);
+ 137:	ba e8 00 00 00       	mov    $0xe8,%edx
+			138: R_386_32	.data
+ 13c:	e8 fc ff ff ff       	call   13d <scull_proc_open+0x10>
+			13d: R_386_PC32	seq_open
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:187
+}
+ 141:	5d                   	pop    %ebp
+ 142:	c3                   	ret    
+
+00000143 <scull_seq_show>:
+scull_seq_show():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:145
+}
+
+/*
+ * In between these calls, the kernel calls the show method to actually output something interesting to the user space. */
+static int scull_seq_show(struct seq_file *s, void *v)
+{
+ 143:	55                   	push   %ebp
+ 144:	89 e5                	mov    %esp,%ebp
+ 146:	57                   	push   %edi
+ 147:	56                   	push   %esi
+ 148:	53                   	push   %ebx
+ 149:	83 ec 20             	sub    $0x20,%esp
+ 14c:	e8 fc ff ff ff       	call   14d <scull_seq_show+0xa>
+			14d: R_386_PC32	mcount
+ 151:	89 45 f0             	mov    %eax,-0x10(%ebp)
+ 154:	89 d7                	mov    %edx,%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:153
+     */
+	struct scull_dev *dev = (struct scull_dev *) v;
+	struct scull_qset *d;
+	int i;
+
+	if (mutex_lock_interruptible(&dev->mutex))
+ 156:	8d 42 14             	lea    0x14(%edx),%eax
+ 159:	89 45 ec             	mov    %eax,-0x14(%ebp)
+ 15c:	e8 fc ff ff ff       	call   15d <scull_seq_show+0x1a>
+			15d: R_386_PC32	mutex_lock_interruptible
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:154
+		return -ERESTARTSYS;
+ 161:	ba 00 fe ff ff       	mov    $0xfffffe00,%edx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:153
+     */
+	struct scull_dev *dev = (struct scull_dev *) v;
+	struct scull_qset *d;
+	int i;
+
+	if (mutex_lock_interruptible(&dev->mutex))
+ 166:	85 c0                	test   %eax,%eax
+ 168:	0f 85 bb 00 00 00    	jne    229 <scull_seq_show+0xe6>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:155
+		return -ERESTARTSYS;
+	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
+ 16e:	8b 47 0c             	mov    0xc(%edi),%eax
+ 171:	89 44 24 14          	mov    %eax,0x14(%esp)
+ 175:	8b 47 04             	mov    0x4(%edi),%eax
+ 178:	89 44 24 10          	mov    %eax,0x10(%esp)
+ 17c:	8b 47 08             	mov    0x8(%edi),%eax
+ 17f:	89 44 24 0c          	mov    %eax,0xc(%esp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:156
+			(int) (dev - scull_devices), dev->qset,
+ 183:	89 f8                	mov    %edi,%eax
+ 185:	2b 05 00 00 00 00    	sub    0x0,%eax
+			187: R_386_32	scull_devices
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:155
+	struct scull_qset *d;
+	int i;
+
+	if (mutex_lock_interruptible(&dev->mutex))
+		return -ERESTARTSYS;
+	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
+ 18b:	c1 f8 02             	sar    $0x2,%eax
+ 18e:	69 c0 29 5c 8f c2    	imul   $0xc28f5c29,%eax,%eax
+ 194:	89 44 24 08          	mov    %eax,0x8(%esp)
+ 198:	c7 44 24 04 5c 00 00 	movl   $0x5c,0x4(%esp)
+ 19f:	00 
+			19c: R_386_32	.rodata.str1.4
+ 1a0:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 1a3:	89 04 24             	mov    %eax,(%esp)
+ 1a6:	e8 fc ff ff ff       	call   1a7 <scull_seq_show+0x64>
+			1a7: R_386_PC32	seq_printf
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:158
+			(int) (dev - scull_devices), dev->qset,
+			dev->quantum, dev->size);
+	for (d = dev->data; d; d = d->next) { /* scan the list */
+ 1ab:	8b 1f                	mov    (%edi),%ebx
+ 1ad:	85 db                	test   %ebx,%ebx
+ 1af:	75 04                	jne    1b5 <scull_seq_show+0x72>
+ 1b1:	eb 69                	jmp    21c <scull_seq_show+0xd9>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:145
+}
+
+/*
+ * In between these calls, the kernel calls the show method to actually output something interesting to the user space. */
+static int scull_seq_show(struct seq_file *s, void *v)
+{
+ 1b3:	89 c3                	mov    %eax,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:159
+		return -ERESTARTSYS;
+	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
+			(int) (dev - scull_devices), dev->qset,
+			dev->quantum, dev->size);
+	for (d = dev->data; d; d = d->next) { /* scan the list */
+		seq_printf(s, "  item at %p, qset at %p\n", d, d->data);
+ 1b5:	8b 03                	mov    (%ebx),%eax
+ 1b7:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ 1bb:	89 5c 24 08          	mov    %ebx,0x8(%esp)
+ 1bf:	c7 44 24 04 17 00 00 	movl   $0x17,0x4(%esp)
+ 1c6:	00 
+			1c3: R_386_32	.rodata.str1.1
+ 1c7:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 1ca:	89 04 24             	mov    %eax,(%esp)
+ 1cd:	e8 fc ff ff ff       	call   1ce <scull_seq_show+0x8b>
+			1ce: R_386_PC32	seq_printf
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:160
+		if (d->data && !d->next) /* dump only the last item */
+ 1d2:	83 3b 00             	cmpl   $0x0,(%ebx)
+ 1d5:	74 3e                	je     215 <scull_seq_show+0xd2>
+ 1d7:	8b 43 04             	mov    0x4(%ebx),%eax
+ 1da:	85 c0                	test   %eax,%eax
+ 1dc:	75 d5                	jne    1b3 <scull_seq_show+0x70>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:161
+			for (i = 0; i < dev->qset; i++) {
+ 1de:	83 7f 08 00          	cmpl   $0x0,0x8(%edi)
+ 1e2:	7e 38                	jle    21c <scull_seq_show+0xd9>
+ 1e4:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:162
+				if (d->data[i])
+ 1e9:	8b 03                	mov    (%ebx),%eax
+ 1eb:	8b 04 b0             	mov    (%eax,%esi,4),%eax
+ 1ee:	85 c0                	test   %eax,%eax
+ 1f0:	74 1b                	je     20d <scull_seq_show+0xca>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:163
+					seq_printf(s, "    % 4i: %8p\n",
+ 1f2:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ 1f6:	89 74 24 08          	mov    %esi,0x8(%esp)
+ 1fa:	c7 44 24 04 31 00 00 	movl   $0x31,0x4(%esp)
+ 201:	00 
+			1fe: R_386_32	.rodata.str1.1
+ 202:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 205:	89 04 24             	mov    %eax,(%esp)
+ 208:	e8 fc ff ff ff       	call   209 <scull_seq_show+0xc6>
+			209: R_386_PC32	seq_printf
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:161
+			(int) (dev - scull_devices), dev->qset,
+			dev->quantum, dev->size);
+	for (d = dev->data; d; d = d->next) { /* scan the list */
+		seq_printf(s, "  item at %p, qset at %p\n", d, d->data);
+		if (d->data && !d->next) /* dump only the last item */
+			for (i = 0; i < dev->qset; i++) {
+ 20d:	83 c6 01             	add    $0x1,%esi
+ 210:	39 77 08             	cmp    %esi,0x8(%edi)
+ 213:	7f d4                	jg     1e9 <scull_seq_show+0xa6>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:158
+	if (mutex_lock_interruptible(&dev->mutex))
+		return -ERESTARTSYS;
+	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
+			(int) (dev - scull_devices), dev->qset,
+			dev->quantum, dev->size);
+	for (d = dev->data; d; d = d->next) { /* scan the list */
+ 215:	8b 43 04             	mov    0x4(%ebx),%eax
+ 218:	85 c0                	test   %eax,%eax
+ 21a:	75 97                	jne    1b3 <scull_seq_show+0x70>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:167
+				if (d->data[i])
+					seq_printf(s, "    % 4i: %8p\n",
+							i, d->data[i]);
+			}
+	}
+	mutex_unlock(&dev->mutex);
+ 21c:	8b 45 ec             	mov    -0x14(%ebp),%eax
+ 21f:	e8 fc ff ff ff       	call   220 <scull_seq_show+0xdd>
+			220: R_386_PC32	mutex_unlock
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:168
+	return 0;
+ 224:	ba 00 00 00 00       	mov    $0x0,%edx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:169
+}
+ 229:	89 d0                	mov    %edx,%eax
+ 22b:	83 c4 20             	add    $0x20,%esp
+ 22e:	5b                   	pop    %ebx
+ 22f:	5e                   	pop    %esi
+ 230:	5f                   	pop    %edi
+ 231:	5d                   	pop    %ebp
+ 232:	c3                   	ret    
+
+00000233 <scull_read_procmem>:
+scull_read_procmem():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:78
+}
+
+#ifdef SCULL_DEBUG
+int scull_read_procmem(char* buf, char** start, off_t offset,
+        int count, int *eof, void *data)
+{
+ 233:	55                   	push   %ebp
+ 234:	89 e5                	mov    %esp,%ebp
+ 236:	57                   	push   %edi
+ 237:	56                   	push   %esi
+ 238:	53                   	push   %ebx
+ 239:	83 ec 2c             	sub    $0x2c,%esp
+ 23c:	e8 fc ff ff ff       	call   23d <scull_read_procmem+0xa>
+			23d: R_386_PC32	mcount
+ 241:	89 45 ec             	mov    %eax,-0x14(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:80
+    int i,j,len=0;
+    int limit = count - 80; /* Don't print more than this */
+ 244:	8b 45 08             	mov    0x8(%ebp),%eax
+ 247:	83 e8 50             	sub    $0x50,%eax
+ 24a:	89 45 e8             	mov    %eax,-0x18(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:82
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+ 24d:	83 3d 00 00 00 00 00 	cmpl   $0x0,0x0
+			24f: R_386_32	scull_nr_devs
+ 254:	0f 8e 10 01 00 00    	jle    36a <scull_read_procmem+0x137>
+ 25a:	85 c0                	test   %eax,%eax
+ 25c:	0f 88 08 01 00 00    	js     36a <scull_read_procmem+0x137>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:79
+
+#ifdef SCULL_DEBUG
+int scull_read_procmem(char* buf, char** start, off_t offset,
+        int count, int *eof, void *data)
+{
+    int i,j,len=0;
+ 262:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:82
+    int limit = count - 80; /* Don't print more than this */
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+ 267:	c7 45 e4 00 00 00 00 	movl   $0x0,-0x1c(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:76
+    dev->data = NULL;
+    return 0;
+}
+
+#ifdef SCULL_DEBUG
+int scull_read_procmem(char* buf, char** start, off_t offset,
+ 26e:	6b 45 e4 64          	imul   $0x64,-0x1c(%ebp),%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:83
+{
+    int i,j,len=0;
+    int limit = count - 80; /* Don't print more than this */
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+        struct scull_dev *d = &scull_devices[i];
+ 272:	03 05 00 00 00 00    	add    0x0,%eax
+			274: R_386_32	scull_devices
+ 278:	89 45 f0             	mov    %eax,-0x10(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:84
+        struct scull_qset *qs = d->data;
+ 27b:	8b 18                	mov    (%eax),%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:85
+        if (mutex_lock_interruptible(&d->mutex))
+ 27d:	83 c0 14             	add    $0x14,%eax
+ 280:	89 45 e0             	mov    %eax,-0x20(%ebp)
+ 283:	e8 fc ff ff ff       	call   284 <scull_read_procmem+0x51>
+			284: R_386_PC32	mutex_lock_interruptible
+ 288:	85 c0                	test   %eax,%eax
+ 28a:	0f 85 ea 00 00 00    	jne    37a <scull_read_procmem+0x147>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:88
+            return -ERESTARTSYS;
+
+        len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
+ 290:	8b 55 f0             	mov    -0x10(%ebp),%edx
+ 293:	8b 42 0c             	mov    0xc(%edx),%eax
+ 296:	89 44 24 14          	mov    %eax,0x14(%esp)
+ 29a:	8b 42 04             	mov    0x4(%edx),%eax
+ 29d:	89 44 24 10          	mov    %eax,0x10(%esp)
+ 2a1:	8b 42 08             	mov    0x8(%edx),%eax
+ 2a4:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ 2a8:	8b 45 e4             	mov    -0x1c(%ebp),%eax
+ 2ab:	89 44 24 08          	mov    %eax,0x8(%esp)
+ 2af:	c7 44 24 04 5c 00 00 	movl   $0x5c,0x4(%esp)
+ 2b6:	00 
+			2b3: R_386_32	.rodata.str1.4
+ 2b7:	8b 45 ec             	mov    -0x14(%ebp),%eax
+ 2ba:	01 f0                	add    %esi,%eax
+ 2bc:	89 04 24             	mov    %eax,(%esp)
+ 2bf:	e8 fc ff ff ff       	call   2c0 <scull_read_procmem+0x8d>
+			2c0: R_386_PC32	sprintf
+ 2c4:	01 c6                	add    %eax,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:91
+                i, d->qset, d->quantum, d->size);
+
+        for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+ 2c6:	85 db                	test   %ebx,%ebx
+ 2c8:	74 7e                	je     348 <scull_read_procmem+0x115>
+ 2ca:	39 75 e8             	cmp    %esi,-0x18(%ebp)
+ 2cd:	7c 79                	jl     348 <scull_read_procmem+0x115>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:92
+            len += sprintf(buf+len, " item at %p, qset at %p\n",
+ 2cf:	8b 03                	mov    (%ebx),%eax
+ 2d1:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ 2d5:	89 5c 24 08          	mov    %ebx,0x8(%esp)
+ 2d9:	c7 44 24 04 40 00 00 	movl   $0x40,0x4(%esp)
+ 2e0:	00 
+			2dd: R_386_32	.rodata.str1.1
+ 2e1:	8b 45 ec             	mov    -0x14(%ebp),%eax
+ 2e4:	01 f0                	add    %esi,%eax
+ 2e6:	89 04 24             	mov    %eax,(%esp)
+ 2e9:	e8 fc ff ff ff       	call   2ea <scull_read_procmem+0xb7>
+			2ea: R_386_PC32	sprintf
+ 2ee:	01 c6                	add    %eax,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:94
+                    qs, qs->data);
+            if (qs->data && !qs->next) /* dump only the last item */
+ 2f0:	83 3b 00             	cmpl   $0x0,(%ebx)
+ 2f3:	74 47                	je     33c <scull_read_procmem+0x109>
+ 2f5:	83 7b 04 00          	cmpl   $0x0,0x4(%ebx)
+ 2f9:	75 41                	jne    33c <scull_read_procmem+0x109>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:95
+                for (j = 0; j < d->qset; j++) {
+ 2fb:	8b 55 f0             	mov    -0x10(%ebp),%edx
+ 2fe:	83 7a 08 00          	cmpl   $0x0,0x8(%edx)
+ 302:	7e 44                	jle    348 <scull_read_procmem+0x115>
+ 304:	bf 00 00 00 00       	mov    $0x0,%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:96
+                    if (qs->data[j])
+ 309:	8b 03                	mov    (%ebx),%eax
+ 30b:	8b 04 b8             	mov    (%eax,%edi,4),%eax
+ 30e:	85 c0                	test   %eax,%eax
+ 310:	74 1f                	je     331 <scull_read_procmem+0xfe>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:97
+                        len += sprintf(buf + len, "\t%4i:%8p\n",
+ 312:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ 316:	89 7c 24 08          	mov    %edi,0x8(%esp)
+ 31a:	c7 44 24 04 59 00 00 	movl   $0x59,0x4(%esp)
+ 321:	00 
+			31e: R_386_32	.rodata.str1.1
+ 322:	8b 45 ec             	mov    -0x14(%ebp),%eax
+ 325:	01 f0                	add    %esi,%eax
+ 327:	89 04 24             	mov    %eax,(%esp)
+ 32a:	e8 fc ff ff ff       	call   32b <scull_read_procmem+0xf8>
+			32b: R_386_PC32	sprintf
+ 32f:	01 c6                	add    %eax,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:95
+
+        for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+            len += sprintf(buf+len, " item at %p, qset at %p\n",
+                    qs, qs->data);
+            if (qs->data && !qs->next) /* dump only the last item */
+                for (j = 0; j < d->qset; j++) {
+ 331:	83 c7 01             	add    $0x1,%edi
+ 334:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 337:	39 78 08             	cmp    %edi,0x8(%eax)
+ 33a:	7f cd                	jg     309 <scull_read_procmem+0xd6>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:91
+            return -ERESTARTSYS;
+
+        len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
+                i, d->qset, d->quantum, d->size);
+
+        for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+ 33c:	8b 5b 04             	mov    0x4(%ebx),%ebx
+ 33f:	85 db                	test   %ebx,%ebx
+ 341:	74 05                	je     348 <scull_read_procmem+0x115>
+ 343:	3b 75 e8             	cmp    -0x18(%ebp),%esi
+ 346:	7e 87                	jle    2cf <scull_read_procmem+0x9c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:101
+                    if (qs->data[j])
+                        len += sprintf(buf + len, "\t%4i:%8p\n",
+                               j, qs->data[j]);
+                }
+        } 
+        mutex_unlock(&d->mutex);
+ 348:	8b 45 e0             	mov    -0x20(%ebp),%eax
+ 34b:	e8 fc ff ff ff       	call   34c <scull_read_procmem+0x119>
+			34c: R_386_PC32	mutex_unlock
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:82
+        int count, int *eof, void *data)
+{
+    int i,j,len=0;
+    int limit = count - 80; /* Don't print more than this */
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+ 350:	83 45 e4 01          	addl   $0x1,-0x1c(%ebp)
+ 354:	8b 55 e4             	mov    -0x1c(%ebp),%edx
+ 357:	39 15 00 00 00 00    	cmp    %edx,0x0
+			359: R_386_32	scull_nr_devs
+ 35d:	7e 10                	jle    36f <scull_read_procmem+0x13c>
+ 35f:	39 75 e8             	cmp    %esi,-0x18(%ebp)
+ 362:	0f 8d 06 ff ff ff    	jge    26e <scull_read_procmem+0x3b>
+ 368:	eb 05                	jmp    36f <scull_read_procmem+0x13c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:79
+
+#ifdef SCULL_DEBUG
+int scull_read_procmem(char* buf, char** start, off_t offset,
+        int count, int *eof, void *data)
+{
+    int i,j,len=0;
+ 36a:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:103
+                               j, qs->data[j]);
+                }
+        } 
+        mutex_unlock(&d->mutex);
+    }
+    *eof = 1;
+ 36f:	8b 45 0c             	mov    0xc(%ebp),%eax
+ 372:	c7 00 01 00 00 00    	movl   $0x1,(%eax)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:104
+    return len;
+ 378:	eb 05                	jmp    37f <scull_read_procmem+0x14c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:86
+
+    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+        struct scull_dev *d = &scull_devices[i];
+        struct scull_qset *qs = d->data;
+        if (mutex_lock_interruptible(&d->mutex))
+            return -ERESTARTSYS;
+ 37a:	be 00 fe ff ff       	mov    $0xfffffe00,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:105
+        } 
+        mutex_unlock(&d->mutex);
+    }
+    *eof = 1;
+    return len;
+}
+ 37f:	89 f0                	mov    %esi,%eax
+ 381:	83 c4 2c             	add    $0x2c,%esp
+ 384:	5b                   	pop    %ebx
+ 385:	5e                   	pop    %esi
+ 386:	5f                   	pop    %edi
+ 387:	5d                   	pop    %ebp
+ 388:	c3                   	ret    
+
+00000389 <scull_trim>:
+scull_trim():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:50
+/*
+ * Empty out the scull device; must be called with the device
+ * semaphore held.
+ */
+int scull_trim(struct scull_dev *dev)
+{
+ 389:	55                   	push   %ebp
+ 38a:	89 e5                	mov    %esp,%ebp
+ 38c:	57                   	push   %edi
+ 38d:	56                   	push   %esi
+ 38e:	53                   	push   %ebx
+ 38f:	83 ec 04             	sub    $0x4,%esp
+ 392:	e8 fc ff ff ff       	call   393 <scull_trim+0xa>
+			393: R_386_PC32	mcount
+ 397:	89 45 f0             	mov    %eax,-0x10(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:52
+    struct scull_qset *next, *dptr;
+    int qset = dev->qset;
+ 39a:	8b 78 08             	mov    0x8(%eax),%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:58
+    int i;
+
+    /* call each memory area (4K) a quantum 
+    * a quantum set has 1000 quantums
+    */
+    for (dptr = dev->data; dptr; dptr = next) {
+ 39d:	8b 30                	mov    (%eax),%esi
+ 39f:	85 f6                	test   %esi,%esi
+ 3a1:	75 04                	jne    3a7 <scull_trim+0x1e>
+ 3a3:	eb 3e                	jmp    3e3 <scull_trim+0x5a>
+ 3a5:	89 de                	mov    %ebx,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:59
+        if (dptr->data) { // this quantum set is available
+ 3a7:	83 3e 00             	cmpl   $0x0,(%esi)
+ 3aa:	74 29                	je     3d5 <scull_trim+0x4c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:60
+            for (i = 0; i < qset; i++)
+ 3ac:	85 ff                	test   %edi,%edi
+ 3ae:	66 90                	xchg   %ax,%ax
+ 3b0:	7e 16                	jle    3c8 <scull_trim+0x3f>
+ 3b2:	bb 00 00 00 00       	mov    $0x0,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:61
+                kfree(dptr->data[i]); // free each quantum
+ 3b7:	8b 06                	mov    (%esi),%eax
+ 3b9:	8b 04 98             	mov    (%eax,%ebx,4),%eax
+ 3bc:	e8 fc ff ff ff       	call   3bd <scull_trim+0x34>
+			3bd: R_386_PC32	kfree
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:60
+    /* call each memory area (4K) a quantum 
+    * a quantum set has 1000 quantums
+    */
+    for (dptr = dev->data; dptr; dptr = next) {
+        if (dptr->data) { // this quantum set is available
+            for (i = 0; i < qset; i++)
+ 3c1:	83 c3 01             	add    $0x1,%ebx
+ 3c4:	39 fb                	cmp    %edi,%ebx
+ 3c6:	75 ef                	jne    3b7 <scull_trim+0x2e>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:62
+                kfree(dptr->data[i]); // free each quantum
+            kfree(dptr->data);
+ 3c8:	8b 06                	mov    (%esi),%eax
+ 3ca:	e8 fc ff ff ff       	call   3cb <scull_trim+0x42>
+			3cb: R_386_PC32	kfree
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:63
+            dptr->data = NULL;
+ 3cf:	c7 06 00 00 00 00    	movl   $0x0,(%esi)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:65
+        }
+        next = dptr->next;
+ 3d5:	8b 5e 04             	mov    0x4(%esi),%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:66
+        kfree(dptr);
+ 3d8:	89 f0                	mov    %esi,%eax
+ 3da:	e8 fc ff ff ff       	call   3db <scull_trim+0x52>
+			3db: R_386_PC32	kfree
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:58
+    int i;
+
+    /* call each memory area (4K) a quantum 
+    * a quantum set has 1000 quantums
+    */
+    for (dptr = dev->data; dptr; dptr = next) {
+ 3df:	85 db                	test   %ebx,%ebx
+ 3e1:	75 c2                	jne    3a5 <scull_trim+0x1c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:68
+            dptr->data = NULL;
+        }
+        next = dptr->next;
+        kfree(dptr);
+    }
+    dev->size = 0;
+ 3e3:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 3e6:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:69
+    dev->quantum = scull_quantum;
+ 3ed:	a1 00 00 00 00       	mov    0x0,%eax
+			3ee: R_386_32	scull_quantum
+ 3f2:	8b 55 f0             	mov    -0x10(%ebp),%edx
+ 3f5:	89 42 04             	mov    %eax,0x4(%edx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:70
+    dev->qset = scull_qset;
+ 3f8:	a1 00 00 00 00       	mov    0x0,%eax
+			3f9: R_386_32	scull_qset
+ 3fd:	89 42 08             	mov    %eax,0x8(%edx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:71
+    dev->data = NULL;
+ 400:	c7 02 00 00 00 00    	movl   $0x0,(%edx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:73
+    return 0;
+}
+ 406:	b8 00 00 00 00       	mov    $0x0,%eax
+ 40b:	83 c4 04             	add    $0x4,%esp
+ 40e:	5b                   	pop    %ebx
+ 40f:	5e                   	pop    %esi
+ 410:	5f                   	pop    %edi
+ 411:	5d                   	pop    %ebp
+ 412:	c3                   	ret    
+
+00000413 <scull_open>:
+scull_open():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:235
+
+/*
+ * Open and Close
+ */
+int scull_open(struct inode *inode, struct file *filp)
+{
+ 413:	55                   	push   %ebp
+ 414:	89 e5                	mov    %esp,%ebp
+ 416:	83 ec 08             	sub    $0x8,%esp
+ 419:	89 5d f8             	mov    %ebx,-0x8(%ebp)
+ 41c:	89 75 fc             	mov    %esi,-0x4(%ebp)
+ 41f:	e8 fc ff ff ff       	call   420 <scull_open+0xd>
+			420: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:238
+    struct scull_dev *dev;
+
+    dev = container_of(inode->i_cdev, struct scull_dev, cdev);
+ 424:	8b b0 38 01 00 00    	mov    0x138(%eax),%esi
+ 42a:	8d 5e d8             	lea    -0x28(%esi),%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:239
+    filp->private_data = dev;
+ 42d:	89 5a 74             	mov    %ebx,0x74(%edx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:242
+
+    /* now trim to 0 the length of the deivce if open was write-only */
+    if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
+ 430:	8b 52 20             	mov    0x20(%edx),%edx
+ 433:	83 e2 03             	and    $0x3,%edx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:248
+        if (mutex_lock_interruptible(&dev->mutex))
+            return -ERESTARTSYS;
+        scull_trim(dev);
+        mutex_unlock(&dev->mutex);
+    }
+    return 0;
+ 436:	b8 00 00 00 00       	mov    $0x0,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:242
+
+    dev = container_of(inode->i_cdev, struct scull_dev, cdev);
+    filp->private_data = dev;
+
+    /* now trim to 0 the length of the deivce if open was write-only */
+    if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
+ 43b:	83 fa 01             	cmp    $0x1,%edx
+ 43e:	75 28                	jne    468 <scull_open+0x55>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:243
+        if (mutex_lock_interruptible(&dev->mutex))
+ 440:	83 ee 14             	sub    $0x14,%esi
+ 443:	89 f0                	mov    %esi,%eax
+ 445:	e8 fc ff ff ff       	call   446 <scull_open+0x33>
+			446: R_386_PC32	mutex_lock_interruptible
+ 44a:	89 c2                	mov    %eax,%edx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:244
+            return -ERESTARTSYS;
+ 44c:	b8 00 fe ff ff       	mov    $0xfffffe00,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:243
+    dev = container_of(inode->i_cdev, struct scull_dev, cdev);
+    filp->private_data = dev;
+
+    /* now trim to 0 the length of the deivce if open was write-only */
+    if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
+        if (mutex_lock_interruptible(&dev->mutex))
+ 451:	85 d2                	test   %edx,%edx
+ 453:	75 13                	jne    468 <scull_open+0x55>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:245
+            return -ERESTARTSYS;
+        scull_trim(dev);
+ 455:	89 d8                	mov    %ebx,%eax
+ 457:	e8 fc ff ff ff       	call   458 <scull_open+0x45>
+			458: R_386_PC32	scull_trim
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:246
+        mutex_unlock(&dev->mutex);
+ 45c:	89 f0                	mov    %esi,%eax
+ 45e:	e8 fc ff ff ff       	call   45f <scull_open+0x4c>
+			45f: R_386_PC32	mutex_unlock
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:248
+    }
+    return 0;
+ 463:	b8 00 00 00 00       	mov    $0x0,%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:249
+}
+ 468:	8b 5d f8             	mov    -0x8(%ebp),%ebx
+ 46b:	8b 75 fc             	mov    -0x4(%ebp),%esi
+ 46e:	89 ec                	mov    %ebp,%esp
+ 470:	5d                   	pop    %ebp
+ 471:	c3                   	ret    
+
+00000472 <scull_follow>:
+scull_follow():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:257
+{
+    return 0;
+}
+
+struct scull_qset *scull_follow(struct scull_dev *dev, int n)
+{
+ 472:	55                   	push   %ebp
+ 473:	89 e5                	mov    %esp,%ebp
+ 475:	57                   	push   %edi
+ 476:	56                   	push   %esi
+ 477:	53                   	push   %ebx
+ 478:	e8 fc ff ff ff       	call   479 <scull_follow+0x7>
+			479: R_386_PC32	mcount
+ 47d:	89 c7                	mov    %eax,%edi
+ 47f:	89 d6                	mov    %edx,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:258
+    struct scull_qset *qs = dev->data;
+ 481:	8b 18                	mov    (%eax),%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:260
+    /* allocate the first qset explicitly if need be */
+    if (!qs) {
+ 483:	85 db                	test   %ebx,%ebx
+ 485:	75 2d                	jne    4b4 <scull_follow+0x42>
+kmalloc_slab():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:217
+	int index = kmalloc_index(size);
+
+	if (index == 0)
+		return NULL;
+
+	return kmalloc_caches[index];
+ 487:	a1 0c 00 00 00       	mov    0xc,%eax
+			488: R_386_32	kmalloc_caches
+kmalloc():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:277
+			return kmalloc_large(size, flags);
+
+		if (!(flags & SLUB_DMA)) {
+			struct kmem_cache *s = kmalloc_slab(size);
+
+			if (!s)
+ 48c:	85 c0                	test   %eax,%eax
+ 48e:	74 70                	je     500 <scull_follow+0x8e>
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:280
+				return ZERO_SIZE_PTR;
+
+			return kmem_cache_alloc_trace(s, flags, size);
+ 490:	b9 08 00 00 00       	mov    $0x8,%ecx
+ 495:	ba d0 00 00 00       	mov    $0xd0,%edx
+ 49a:	e8 fc ff ff ff       	call   49b <scull_follow+0x29>
+			49b: R_386_PC32	kmem_cache_alloc_trace
+ 49f:	89 c3                	mov    %eax,%ebx
+scull_follow():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:261
+        qs = dev->data = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+ 4a1:	89 07                	mov    %eax,(%edi)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:262
+        if (qs == NULL)
+ 4a3:	85 c0                	test   %eax,%eax
+ 4a5:	74 52                	je     4f9 <scull_follow+0x87>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:264
+            return NULL;
+        memset(qs, 0, sizeof(struct scull_qset));
+ 4a7:	c7 03 00 00 00 00    	movl   $0x0,(%ebx)
+ 4ad:	c7 43 04 00 00 00 00 	movl   $0x0,0x4(%ebx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:268
+    }
+
+    /* then follow the list */
+    while (n--) {
+ 4b4:	85 f6                	test   %esi,%esi
+ 4b6:	74 41                	je     4f9 <scull_follow+0x87>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:269
+        if (!qs->next) {
+ 4b8:	83 7b 04 00          	cmpl   $0x0,0x4(%ebx)
+ 4bc:	75 2c                	jne    4ea <scull_follow+0x78>
+kmalloc_slab():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:217
+	int index = kmalloc_index(size);
+
+	if (index == 0)
+		return NULL;
+
+	return kmalloc_caches[index];
+ 4be:	a1 0c 00 00 00       	mov    0xc,%eax
+			4bf: R_386_32	kmalloc_caches
+kmalloc():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:277
+			return kmalloc_large(size, flags);
+
+		if (!(flags & SLUB_DMA)) {
+			struct kmem_cache *s = kmalloc_slab(size);
+
+			if (!s)
+ 4c3:	85 c0                	test   %eax,%eax
+ 4c5:	74 46                	je     50d <scull_follow+0x9b>
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:280
+				return ZERO_SIZE_PTR;
+
+			return kmem_cache_alloc_trace(s, flags, size);
+ 4c7:	b9 08 00 00 00       	mov    $0x8,%ecx
+ 4cc:	ba d0 00 00 00       	mov    $0xd0,%edx
+ 4d1:	e8 fc ff ff ff       	call   4d2 <scull_follow+0x60>
+			4d2: R_386_PC32	kmem_cache_alloc_trace
+scull_follow():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:270
+            qs->next = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+ 4d6:	89 43 04             	mov    %eax,0x4(%ebx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:271
+            if (qs->next == NULL)
+ 4d9:	85 c0                	test   %eax,%eax
+ 4db:	74 17                	je     4f4 <scull_follow+0x82>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:273
+                return NULL;
+            memset(qs->next, 0, sizeof(struct scull_qset));
+ 4dd:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+ 4e3:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:275
+        }
+        qs = qs->next;
+ 4ea:	8b 5b 04             	mov    0x4(%ebx),%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:268
+            return NULL;
+        memset(qs, 0, sizeof(struct scull_qset));
+    }
+
+    /* then follow the list */
+    while (n--) {
+ 4ed:	83 ee 01             	sub    $0x1,%esi
+ 4f0:	75 c6                	jne    4b8 <scull_follow+0x46>
+ 4f2:	eb 05                	jmp    4f9 <scull_follow+0x87>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:272
+        if (!qs->next) {
+            qs->next = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+            if (qs->next == NULL)
+                return NULL;
+ 4f4:	bb 00 00 00 00       	mov    $0x0,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:279
+        }
+        qs = qs->next;
+        continue;
+    }
+    return qs;
+}
+ 4f9:	89 d8                	mov    %ebx,%eax
+ 4fb:	5b                   	pop    %ebx
+ 4fc:	5e                   	pop    %esi
+ 4fd:	5f                   	pop    %edi
+ 4fe:	5d                   	pop    %ebp
+ 4ff:	c3                   	ret    
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:261
+struct scull_qset *scull_follow(struct scull_dev *dev, int n)
+{
+    struct scull_qset *qs = dev->data;
+    /* allocate the first qset explicitly if need be */
+    if (!qs) {
+        qs = dev->data = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+ 500:	c7 07 10 00 00 00    	movl   $0x10,(%edi)
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:278
+
+		if (!(flags & SLUB_DMA)) {
+			struct kmem_cache *s = kmalloc_slab(size);
+
+			if (!s)
+				return ZERO_SIZE_PTR;
+ 506:	bb 10 00 00 00       	mov    $0x10,%ebx
+ 50b:	eb 9a                	jmp    4a7 <scull_follow+0x35>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:270
+    }
+
+    /* then follow the list */
+    while (n--) {
+        if (!qs->next) {
+            qs->next = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+ 50d:	c7 43 04 10 00 00 00 	movl   $0x10,0x4(%ebx)
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:278
+ 514:	b8 10 00 00 00       	mov    $0x10,%eax
+ 519:	eb c2                	jmp    4dd <scull_follow+0x6b>
+
+0000051b <scull_write>:
+scull_write():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:330
+    mutex_unlock(&dev->mutex);
+    return retval;
+}
+
+ssize_t scull_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
+{
+ 51b:	55                   	push   %ebp
+ 51c:	89 e5                	mov    %esp,%ebp
+ 51e:	57                   	push   %edi
+ 51f:	56                   	push   %esi
+ 520:	53                   	push   %ebx
+ 521:	83 ec 1c             	sub    $0x1c,%esp
+ 524:	e8 fc ff ff ff       	call   525 <scull_write+0xa>
+			525: R_386_PC32	mcount
+ 529:	89 55 d8             	mov    %edx,-0x28(%ebp)
+ 52c:	89 4d e0             	mov    %ecx,-0x20(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:331
+    struct scull_dev *dev = filp->private_data;
+ 52f:	8b 40 74             	mov    0x74(%eax),%eax
+ 532:	89 45 e8             	mov    %eax,-0x18(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:333
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+ 535:	8b 78 04             	mov    0x4(%eax),%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:334
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+ 538:	8b 40 08             	mov    0x8(%eax),%eax
+ 53b:	89 45 dc             	mov    %eax,-0x24(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:339
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = -ENOMEM;
+
+    if (mutex_lock_interruptible(&dev->mutex))
+ 53e:	8b 55 e8             	mov    -0x18(%ebp),%edx
+ 541:	83 c2 14             	add    $0x14,%edx
+ 544:	89 55 e4             	mov    %edx,-0x1c(%ebp)
+ 547:	89 d0                	mov    %edx,%eax
+ 549:	e8 fc ff ff ff       	call   54a <scull_write+0x2f>
+			54a: R_386_PC32	mutex_lock_interruptible
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:340
+        return -ERESTARTSYS;
+ 54e:	bb 00 fe ff ff       	mov    $0xfffffe00,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:339
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = -ENOMEM;
+
+    if (mutex_lock_interruptible(&dev->mutex))
+ 553:	85 c0                	test   %eax,%eax
+ 555:	0f 85 09 01 00 00    	jne    664 <scull_write+0x149>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:335
+{
+    struct scull_dev *dev = filp->private_data;
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+ 55b:	8b 4d dc             	mov    -0x24(%ebp),%ecx
+ 55e:	0f af cf             	imul   %edi,%ecx
+ 561:	89 4d ec             	mov    %ecx,-0x14(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:343
+
+    if (mutex_lock_interruptible(&dev->mutex))
+        return -ERESTARTSYS;
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+ 564:	8b 45 08             	mov    0x8(%ebp),%eax
+ 567:	8b 00                	mov    (%eax),%eax
+ 569:	89 45 f0             	mov    %eax,-0x10(%ebp)
+ 56c:	89 c2                	mov    %eax,%edx
+ 56e:	c1 fa 1f             	sar    $0x1f,%edx
+ 571:	f7 f9                	idiv   %ecx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:349
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+    
+    /* follow the list up to the right position (defined elsewhere) */
+    dptr = scull_follow(dev, item); // find the right list item
+ 573:	89 c2                	mov    %eax,%edx
+ 575:	8b 45 e8             	mov    -0x18(%ebp),%eax
+ 578:	e8 fc ff ff ff       	call   579 <scull_write+0x5e>
+			579: R_386_PC32	scull_follow
+ 57d:	89 c6                	mov    %eax,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:337
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = -ENOMEM;
+ 57f:	66 bb f4 ff          	mov    $0xfff4,%bx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:351
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+    
+    /* follow the list up to the right position (defined elsewhere) */
+    dptr = scull_follow(dev, item); // find the right list item
+
+    if (dptr == NULL)
+ 583:	85 c0                	test   %eax,%eax
+ 585:	0f 84 d1 00 00 00    	je     65c <scull_write+0x141>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:353
+        goto out;
+    if (!dptr->data) {
+ 58b:	83 38 00             	cmpl   $0x0,(%eax)
+ 58e:	75 2d                	jne    5bd <scull_write+0xa2>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:355
+        /* an quantum set has qset_size quantums*/
+        dptr->data = kmalloc(qset_size * sizeof(char*), GFP_KERNEL);
+ 590:	8b 55 dc             	mov    -0x24(%ebp),%edx
+ 593:	c1 e2 02             	shl    $0x2,%edx
+ 596:	89 55 dc             	mov    %edx,-0x24(%ebp)
+kmalloc():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:283
+
+			return kmem_cache_alloc_trace(s, flags, size);
+		}
+	}
+	return __kmalloc(size, flags);
+ 599:	ba d0 00 00 00       	mov    $0xd0,%edx
+ 59e:	8b 45 dc             	mov    -0x24(%ebp),%eax
+ 5a1:	e8 fc ff ff ff       	call   5a2 <scull_write+0x87>
+			5a2: R_386_PC32	__kmalloc
+scull_write():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:355
+ 5a6:	89 06                	mov    %eax,(%esi)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:356
+        if (!dptr->data)
+ 5a8:	85 c0                	test   %eax,%eax
+ 5aa:	0f 84 ac 00 00 00    	je     65c <scull_write+0x141>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:358
+            goto out;
+        memset(dptr->data, 0, qset_size * sizeof(char*));
+ 5b0:	8b 4d dc             	mov    -0x24(%ebp),%ecx
+ 5b3:	ba 00 00 00 00       	mov    $0x0,%edx
+ 5b8:	e8 fc ff ff ff       	call   5b9 <scull_write+0x9e>
+			5b9: R_386_PC32	memset
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:344
+    if (mutex_lock_interruptible(&dev->mutex))
+        return -ERESTARTSYS;
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+ 5bd:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 5c0:	89 c2                	mov    %eax,%edx
+ 5c2:	c1 fa 1f             	sar    $0x1f,%edx
+ 5c5:	f7 7d ec             	idivl  -0x14(%ebp)
+ 5c8:	89 55 f0             	mov    %edx,-0x10(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:345
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+ 5cb:	89 d0                	mov    %edx,%eax
+ 5cd:	c1 fa 1f             	sar    $0x1f,%edx
+ 5d0:	f7 ff                	idiv   %edi
+ 5d2:	89 45 ec             	mov    %eax,-0x14(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:361
+        if (!dptr->data)
+            goto out;
+        memset(dptr->data, 0, qset_size * sizeof(char*));
+    }
+
+    if (!dptr->data[s_pos]) {
+ 5d5:	89 c3                	mov    %eax,%ebx
+ 5d7:	c1 e3 02             	shl    $0x2,%ebx
+ 5da:	03 1e                	add    (%esi),%ebx
+ 5dc:	83 3b 00             	cmpl   $0x0,(%ebx)
+ 5df:	75 1e                	jne    5ff <scull_write+0xe4>
+kmalloc():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:283
+ 5e1:	ba d0 00 00 00       	mov    $0xd0,%edx
+ 5e6:	89 f8                	mov    %edi,%eax
+ 5e8:	e8 fc ff ff ff       	call   5e9 <scull_write+0xce>
+			5e9: R_386_PC32	__kmalloc
+scull_write():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:363
+        /* each quantum has quantum_size bytes */
+        dptr->data[s_pos] = kmalloc(quantum_size, GFP_KERNEL);
+ 5ed:	89 03                	mov    %eax,(%ebx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:364
+        if (!dptr->data[s_pos])
+ 5ef:	8b 06                	mov    (%esi),%eax
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:337
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = -ENOMEM;
+ 5f1:	bb f4 ff ff ff       	mov    $0xfffffff4,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:364
+    }
+
+    if (!dptr->data[s_pos]) {
+        /* each quantum has quantum_size bytes */
+        dptr->data[s_pos] = kmalloc(quantum_size, GFP_KERNEL);
+        if (!dptr->data[s_pos])
+ 5f6:	8b 55 ec             	mov    -0x14(%ebp),%edx
+ 5f9:	83 3c 90 00          	cmpl   $0x0,(%eax,%edx,4)
+ 5fd:	74 5d                	je     65c <scull_write+0x141>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:346
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+ 5ff:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 602:	89 c2                	mov    %eax,%edx
+ 604:	c1 fa 1f             	sar    $0x1f,%edx
+ 607:	f7 ff                	idiv   %edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:369
+        if (!dptr->data[s_pos])
+            goto out;
+    }
+
+    /* write only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+ 609:	29 d7                	sub    %edx,%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:346
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+ 60b:	3b 7d e0             	cmp    -0x20(%ebp),%edi
+ 60e:	0f 47 7d e0          	cmova  -0x20(%ebp),%edi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:372
+
+    /* write only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+        count = quantum_size - q_pos;
+
+    if (copy_from_user(dptr->data[s_pos] + q_pos, buf, count)) {
+ 612:	8b 06                	mov    (%esi),%eax
+ 614:	8b 4d ec             	mov    -0x14(%ebp),%ecx
+ 617:	8b 04 88             	mov    (%eax,%ecx,4),%eax
+ 61a:	01 d0                	add    %edx,%eax
+copy_from_user():
+/usr/src/linux-headers-3.5.0-23-generic/arch/x86/include/asm/uaccess_32.h:209
+					  unsigned long n)
+{
+	int sz = __compiletime_object_size(to);
+
+	if (likely(sz == -1 || sz >= n))
+		n = _copy_from_user(to, from, n);
+ 61c:	89 f9                	mov    %edi,%ecx
+ 61e:	8b 55 d8             	mov    -0x28(%ebp),%edx
+ 621:	e8 fc ff ff ff       	call   622 <scull_write+0x107>
+			622: R_386_PC32	_copy_from_user
+scull_write():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:373
+        retval = -EFAULT;
+ 626:	bb f2 ff ff ff       	mov    $0xfffffff2,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:372
+
+    /* write only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+        count = quantum_size - q_pos;
+
+    if (copy_from_user(dptr->data[s_pos] + q_pos, buf, count)) {
+ 62b:	85 c0                	test   %eax,%eax
+ 62d:	75 2d                	jne    65c <scull_write+0x141>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:376
+        retval = -EFAULT;
+        goto out;
+    }
+    *f_pos += count;
+ 62f:	89 f8                	mov    %edi,%eax
+ 631:	ba 00 00 00 00       	mov    $0x0,%edx
+ 636:	8b 4d 08             	mov    0x8(%ebp),%ecx
+ 639:	03 01                	add    (%ecx),%eax
+ 63b:	13 51 04             	adc    0x4(%ecx),%edx
+ 63e:	89 01                	mov    %eax,(%ecx)
+ 640:	89 51 04             	mov    %edx,0x4(%ecx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:377
+    retval = count;
+ 643:	89 fb                	mov    %edi,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:380
+
+    /* update the size */
+    if (dev->size < *f_pos)
+ 645:	8b 4d e8             	mov    -0x18(%ebp),%ecx
+ 648:	8b 71 0c             	mov    0xc(%ecx),%esi
+ 64b:	83 fa 00             	cmp    $0x0,%edx
+ 64e:	7c 0c                	jl     65c <scull_write+0x141>
+ 650:	7f 04                	jg     656 <scull_write+0x13b>
+ 652:	39 f0                	cmp    %esi,%eax
+ 654:	76 06                	jbe    65c <scull_write+0x141>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:381
+        dev->size = *f_pos;
+ 656:	8b 4d e8             	mov    -0x18(%ebp),%ecx
+ 659:	89 41 0c             	mov    %eax,0xc(%ecx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:383
+out:
+    mutex_unlock(&dev->mutex);
+ 65c:	8b 45 e4             	mov    -0x1c(%ebp),%eax
+ 65f:	e8 fc ff ff ff       	call   660 <scull_write+0x145>
+			660: R_386_PC32	mutex_unlock
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:385
+    return retval;
+}
+ 664:	89 d8                	mov    %ebx,%eax
+ 666:	83 c4 1c             	add    $0x1c,%esp
+ 669:	5b                   	pop    %ebx
+ 66a:	5e                   	pop    %esi
+ 66b:	5f                   	pop    %edi
+ 66c:	5d                   	pop    %ebp
+ 66d:	c3                   	ret    
+
+0000066e <scull_read>:
+scull_read():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:285
+
+/*
+ * Data management: read and write
+ */
+ssize_t scull_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+{
+ 66e:	55                   	push   %ebp
+ 66f:	89 e5                	mov    %esp,%ebp
+ 671:	57                   	push   %edi
+ 672:	56                   	push   %esi
+ 673:	53                   	push   %ebx
+ 674:	83 ec 1c             	sub    $0x1c,%esp
+ 677:	e8 fc ff ff ff       	call   678 <scull_read+0xa>
+			678: R_386_PC32	mcount
+ 67c:	89 55 dc             	mov    %edx,-0x24(%ebp)
+ 67f:	89 4d e0             	mov    %ecx,-0x20(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:286
+    struct scull_dev *dev = filp->private_data;
+ 682:	8b 70 74             	mov    0x74(%eax),%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:288
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+ 685:	8b 5e 04             	mov    0x4(%esi),%ebx
+ 688:	89 5d e4             	mov    %ebx,-0x1c(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:289
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+ 68b:	8b 5e 08             	mov    0x8(%esi),%ebx
+ 68e:	89 5d e8             	mov    %ebx,-0x18(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:294
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = 0;
+
+    if (mutex_lock_interruptible(&dev->mutex))
+ 691:	8d 7e 14             	lea    0x14(%esi),%edi
+ 694:	89 f8                	mov    %edi,%eax
+ 696:	e8 fc ff ff ff       	call   697 <scull_read+0x29>
+			697: R_386_PC32	mutex_lock_interruptible
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:295
+        return -ERESTARTSYS;
+ 69b:	bb 00 fe ff ff       	mov    $0xfffffe00,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:294
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = 0;
+
+    if (mutex_lock_interruptible(&dev->mutex))
+ 6a0:	85 c0                	test   %eax,%eax
+ 6a2:	0f 85 ec 00 00 00    	jne    794 <scull_read+0x126>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:296
+        return -ERESTARTSYS;
+    if (*f_pos >= dev->size)
+ 6a8:	8b 5d 08             	mov    0x8(%ebp),%ebx
+ 6ab:	8b 03                	mov    (%ebx),%eax
+ 6ad:	8b 53 04             	mov    0x4(%ebx),%edx
+ 6b0:	8b 4e 0c             	mov    0xc(%esi),%ecx
+ 6b3:	89 4d d8             	mov    %ecx,-0x28(%ebp)
+ 6b6:	83 fa 00             	cmp    $0x0,%edx
+ 6b9:	0f 8f c9 00 00 00    	jg     788 <scull_read+0x11a>
+ 6bf:	7c 08                	jl     6c9 <scull_read+0x5b>
+ 6c1:	39 c8                	cmp    %ecx,%eax
+ 6c3:	0f 83 bf 00 00 00    	jae    788 <scull_read+0x11a>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:298
+        goto out;
+    if (*f_pos + count > dev->size)
+ 6c9:	8b 4d e0             	mov    -0x20(%ebp),%ecx
+ 6cc:	89 4d ec             	mov    %ecx,-0x14(%ebp)
+ 6cf:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
+ 6d6:	8b 4d ec             	mov    -0x14(%ebp),%ecx
+ 6d9:	8b 5d f0             	mov    -0x10(%ebp),%ebx
+ 6dc:	01 c1                	add    %eax,%ecx
+ 6de:	11 d3                	adc    %edx,%ebx
+ 6e0:	89 4d ec             	mov    %ecx,-0x14(%ebp)
+ 6e3:	89 5d f0             	mov    %ebx,-0x10(%ebp)
+ 6e6:	b9 00 00 00 00       	mov    $0x0,%ecx
+ 6eb:	39 d9                	cmp    %ebx,%ecx
+ 6ed:	7f 15                	jg     704 <scull_read+0x96>
+ 6ef:	3b 4d f0             	cmp    -0x10(%ebp),%ecx
+ 6f2:	7c 08                	jl     6fc <scull_read+0x8e>
+ 6f4:	8b 5d ec             	mov    -0x14(%ebp),%ebx
+ 6f7:	39 5d d8             	cmp    %ebx,-0x28(%ebp)
+ 6fa:	73 08                	jae    704 <scull_read+0x96>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:299
+        count = dev->size - *f_pos;
+ 6fc:	8b 4d d8             	mov    -0x28(%ebp),%ecx
+ 6ff:	29 c1                	sub    %eax,%ecx
+ 701:	89 4d e0             	mov    %ecx,-0x20(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:290
+{
+    struct scull_dev *dev = filp->private_data;
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+ 704:	8b 5d e4             	mov    -0x1c(%ebp),%ebx
+ 707:	0f af 5d e8          	imul   -0x18(%ebp),%ebx
+ 70b:	89 5d ec             	mov    %ebx,-0x14(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:302
+        goto out;
+    if (*f_pos + count > dev->size)
+        count = dev->size - *f_pos;
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+ 70e:	89 45 e8             	mov    %eax,-0x18(%ebp)
+ 711:	89 c2                	mov    %eax,%edx
+ 713:	c1 fa 1f             	sar    $0x1f,%edx
+ 716:	f7 fb                	idiv   %ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:308
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+    
+    /* follow the list up to the right position (defined elsewhere) */
+    dptr = scull_follow(dev, item); // find the right list item
+ 718:	89 c2                	mov    %eax,%edx
+ 71a:	89 f0                	mov    %esi,%eax
+ 71c:	e8 fc ff ff ff       	call   71d <scull_read+0xaf>
+			71d: R_386_PC32	scull_follow
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:292
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = 0;
+ 721:	bb 00 00 00 00       	mov    $0x0,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:310
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+    
+    /* follow the list up to the right position (defined elsewhere) */
+    dptr = scull_follow(dev, item); // find the right list item
+
+    if (dptr == NULL || !dptr->data || !dptr->data[s_pos])
+ 726:	85 c0                	test   %eax,%eax
+ 728:	74 63                	je     78d <scull_read+0x11f>
+ 72a:	8b 08                	mov    (%eax),%ecx
+ 72c:	85 c9                	test   %ecx,%ecx
+ 72e:	74 5d                	je     78d <scull_read+0x11f>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:303
+    if (*f_pos + count > dev->size)
+        count = dev->size - *f_pos;
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+ 730:	8b 45 e8             	mov    -0x18(%ebp),%eax
+ 733:	89 c2                	mov    %eax,%edx
+ 735:	c1 fa 1f             	sar    $0x1f,%edx
+ 738:	f7 7d ec             	idivl  -0x14(%ebp)
+ 73b:	89 d6                	mov    %edx,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:304
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+ 73d:	89 d0                	mov    %edx,%eax
+ 73f:	c1 fa 1f             	sar    $0x1f,%edx
+ 742:	f7 7d e4             	idivl  -0x1c(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:310
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+    
+    /* follow the list up to the right position (defined elsewhere) */
+    dptr = scull_follow(dev, item); // find the right list item
+
+    if (dptr == NULL || !dptr->data || !dptr->data[s_pos])
+ 745:	8b 0c 81             	mov    (%ecx,%eax,4),%ecx
+ 748:	85 c9                	test   %ecx,%ecx
+ 74a:	74 41                	je     78d <scull_read+0x11f>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:305
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+ 74c:	89 f0                	mov    %esi,%eax
+ 74e:	89 f2                	mov    %esi,%edx
+ 750:	c1 fa 1f             	sar    $0x1f,%edx
+ 753:	f7 7d e4             	idivl  -0x1c(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:314
+
+    if (dptr == NULL || !dptr->data || !dptr->data[s_pos])
+        goto out;
+
+    /* read only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+ 756:	8b 75 e4             	mov    -0x1c(%ebp),%esi
+ 759:	29 d6                	sub    %edx,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:305
+
+    /* find listitem, qset index, and offset in the quantum */
+    item = (long) *f_pos / item_size;// how many list items the current position is more than
+    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+    q_pos = rest % quantum_size; //the last byte position in a quantum
+ 75b:	39 75 e0             	cmp    %esi,-0x20(%ebp)
+ 75e:	0f 46 75 e0          	cmovbe -0x20(%ebp),%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:317
+
+    /* read only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+        count = quantum_size - q_pos;
+
+    if (copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
+ 762:	01 ca                	add    %ecx,%edx
+ 764:	89 f1                	mov    %esi,%ecx
+ 766:	8b 45 dc             	mov    -0x24(%ebp),%eax
+ 769:	e8 fc ff ff ff       	call   76a <scull_read+0xfc>
+			76a: R_386_PC32	copy_to_user
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:318
+        retval = -EFAULT;
+ 76e:	bb f2 ff ff ff       	mov    $0xfffffff2,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:317
+
+    /* read only up to the end of this quantum */
+    if (count > quantum_size - q_pos)
+        count = quantum_size - q_pos;
+
+    if (copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
+ 773:	85 c0                	test   %eax,%eax
+ 775:	75 16                	jne    78d <scull_read+0x11f>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:321
+        retval = -EFAULT;
+        goto out;
+    }
+    *f_pos += count;
+ 777:	ba 00 00 00 00       	mov    $0x0,%edx
+ 77c:	8b 5d 08             	mov    0x8(%ebp),%ebx
+ 77f:	01 33                	add    %esi,(%ebx)
+ 781:	11 53 04             	adc    %edx,0x4(%ebx)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:322
+    retval = count;
+ 784:	89 f3                	mov    %esi,%ebx
+ 786:	eb 05                	jmp    78d <scull_read+0x11f>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:292
+    struct scull_qset *dptr; /* the first listitem */
+    int quantum_size = dev->quantum; //bytes of a quantum
+    int qset_size = dev->qset;  //num of quantum of a quantum set
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item, s_pos, q_pos, rest;
+    ssize_t retval = 0;
+ 788:	bb 00 00 00 00       	mov    $0x0,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:325
+    }
+    *f_pos += count;
+    retval = count;
+
+out:
+    mutex_unlock(&dev->mutex);
+ 78d:	89 f8                	mov    %edi,%eax
+ 78f:	e8 fc ff ff ff       	call   790 <scull_read+0x122>
+			790: R_386_PC32	mutex_unlock
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:327
+    return retval;
+}
+ 794:	89 d8                	mov    %ebx,%eax
+ 796:	83 c4 1c             	add    $0x1c,%esp
+ 799:	5b                   	pop    %ebx
+ 79a:	5e                   	pop    %esi
+ 79b:	5f                   	pop    %edi
+ 79c:	5d                   	pop    %ebp
+ 79d:	c3                   	ret    
+
+0000079e <cleanup_module>:
+scull_cleanup_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:448
+ * The cleanup function is used to handle initialization failures as well.
+ * Thefore, it must be carefull to work correctly even if some of the items
+ * have not been initialized
+ */
+void scull_cleanup_module(void)
+{
+ 79e:	55                   	push   %ebp
+ 79f:	89 e5                	mov    %esp,%ebp
+ 7a1:	57                   	push   %edi
+ 7a2:	56                   	push   %esi
+ 7a3:	53                   	push   %ebx
+ 7a4:	83 ec 08             	sub    $0x8,%esp
+ 7a7:	e8 fc ff ff ff       	call   7a8 <cleanup_module+0xa>
+			7a8: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:450
+    int i;
+    dev_t devno = MKDEV(scull_major, scull_minor);
+ 7ac:	8b 3d 00 00 00 00    	mov    0x0,%edi
+			7ae: R_386_32	scull_major
+ 7b2:	c1 e7 14             	shl    $0x14,%edi
+ 7b5:	0b 3d 00 00 00 00    	or     0x0,%edi
+			7b7: R_386_32	scull_minor
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:453
+
+    /* Get rid of our char dev entries */
+    if (scull_devices) {
+ 7bb:	83 3d 00 00 00 00 00 	cmpl   $0x0,0x0
+			7bd: R_386_32	scull_devices
+ 7c2:	74 48                	je     80c <cleanup_module+0x6e>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:454
+        for (i=0; i < scull_nr_devs; i++) {
+ 7c4:	83 3d 00 00 00 00 00 	cmpl   $0x0,0x0
+			7c6: R_386_32	scull_nr_devs
+ 7cb:	7e 35                	jle    802 <cleanup_module+0x64>
+ 7cd:	bb 00 00 00 00       	mov    $0x0,%ebx
+ 7d2:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:455
+            scull_trim(scull_devices + i);
+ 7d7:	89 d8                	mov    %ebx,%eax
+ 7d9:	03 05 00 00 00 00    	add    0x0,%eax
+			7db: R_386_32	scull_devices
+ 7df:	e8 fc ff ff ff       	call   7e0 <cleanup_module+0x42>
+			7e0: R_386_PC32	scull_trim
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:456
+            cdev_del(&scull_devices[i].cdev);
+ 7e4:	89 d8                	mov    %ebx,%eax
+ 7e6:	03 05 00 00 00 00    	add    0x0,%eax
+			7e8: R_386_32	scull_devices
+ 7ec:	83 c0 28             	add    $0x28,%eax
+ 7ef:	e8 fc ff ff ff       	call   7f0 <cleanup_module+0x52>
+			7f0: R_386_PC32	cdev_del
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:454
+    int i;
+    dev_t devno = MKDEV(scull_major, scull_minor);
+
+    /* Get rid of our char dev entries */
+    if (scull_devices) {
+        for (i=0; i < scull_nr_devs; i++) {
+ 7f4:	83 c6 01             	add    $0x1,%esi
+ 7f7:	83 c3 64             	add    $0x64,%ebx
+ 7fa:	39 35 00 00 00 00    	cmp    %esi,0x0
+			7fc: R_386_32	scull_nr_devs
+ 800:	7f d5                	jg     7d7 <cleanup_module+0x39>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:458
+            scull_trim(scull_devices + i);
+            cdev_del(&scull_devices[i].cdev);
+        }
+        kfree(scull_devices);
+ 802:	a1 00 00 00 00       	mov    0x0,%eax
+			803: R_386_32	scull_devices
+ 807:	e8 fc ff ff ff       	call   808 <cleanup_module+0x6a>
+			808: R_386_PC32	kfree
+scull_remove_proc():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:225
+}
+
+static void scull_remove_proc(void)
+{
+	/* no problem if it was not registered */
+	remove_proc_entry("scullmem", NULL /* parent dir */);
+ 80c:	ba 00 00 00 00       	mov    $0x0,%edx
+ 811:	b8 63 00 00 00       	mov    $0x63,%eax
+			812: R_386_32	.rodata.str1.1
+ 816:	e8 fc ff ff ff       	call   817 <cleanup_module+0x79>
+			817: R_386_PC32	remove_proc_entry
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:226
+	remove_proc_entry("scullseq", NULL);
+ 81b:	ba 00 00 00 00       	mov    $0x0,%edx
+ 820:	b8 6c 00 00 00       	mov    $0x6c,%eax
+			821: R_386_32	.rodata.str1.1
+ 825:	e8 fc ff ff ff       	call   826 <cleanup_module+0x88>
+			826: R_386_PC32	remove_proc_entry
+scull_cleanup_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:465
+#ifdef SCULL_DEBUG
+    scull_remove_proc();
+#endif
+
+    /* cleanup_module is never called if registering failed */
+    unregister_chrdev_region(devno, scull_nr_devs);
+ 82a:	8b 15 00 00 00 00    	mov    0x0,%edx
+			82c: R_386_32	scull_nr_devs
+ 830:	89 f8                	mov    %edi,%eax
+ 832:	e8 fc ff ff ff       	call   833 <cleanup_module+0x95>
+			833: R_386_PC32	unregister_chrdev_region
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:466
+    printk(KERN_WARNING "scull exit, major %d\n", scull_major);
+ 837:	a1 00 00 00 00       	mov    0x0,%eax
+			838: R_386_32	scull_major
+ 83c:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 840:	c7 04 24 75 00 00 00 	movl   $0x75,(%esp)
+			843: R_386_32	.rodata.str1.1
+ 847:	e8 fc ff ff ff       	call   848 <cleanup_module+0xaa>
+			848: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:467
+}
+ 84c:	83 c4 08             	add    $0x8,%esp
+ 84f:	5b                   	pop    %ebx
+ 850:	5e                   	pop    %esi
+ 851:	5f                   	pop    %edi
+ 852:	5d                   	pop    %ebp
+ 853:	c3                   	ret    
+
+00000854 <init_module>:
+scull_init_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:485
+    if (err)
+        printk(KERN_NOTICE "Error %d adding scull%d", err, index);
+}
+
+int scull_init_module(void)
+{
+ 854:	55                   	push   %ebp
+ 855:	89 e5                	mov    %esp,%ebp
+ 857:	57                   	push   %edi
+ 858:	56                   	push   %esi
+ 859:	53                   	push   %ebx
+ 85a:	83 ec 24             	sub    $0x24,%esp
+ 85d:	e8 fc ff ff ff       	call   85e <init_module+0xa>
+			85e: R_386_PC32	mcount
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:487
+    int result, i;
+    dev_t dev = 0;
+ 862:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:492
+
+    /* Get a range of minor numbers to work with, asking for a
+     * dynamic major unless directed otherwise at load time.
+     */
+    if (scull_major) {
+ 869:	a1 00 00 00 00       	mov    0x0,%eax
+			86a: R_386_32	scull_major
+ 86e:	85 c0                	test   %eax,%eax
+ 870:	74 20                	je     892 <init_module+0x3e>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:493
+        dev = MKDEV(scull_major, scull_minor);
+ 872:	c1 e0 14             	shl    $0x14,%eax
+ 875:	0b 05 00 00 00 00    	or     0x0,%eax
+			877: R_386_32	scull_minor
+ 87b:	89 45 f0             	mov    %eax,-0x10(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:494
+        result = register_chrdev_region(dev, scull_nr_devs, "scull");
+ 87e:	b9 8e 00 00 00       	mov    $0x8e,%ecx
+			87f: R_386_32	.rodata.str1.1
+ 883:	8b 15 00 00 00 00    	mov    0x0,%edx
+			885: R_386_32	scull_nr_devs
+ 889:	e8 fc ff ff ff       	call   88a <init_module+0x36>
+			88a: R_386_PC32	register_chrdev_region
+ 88e:	89 c3                	mov    %eax,%ebx
+ 890:	eb 28                	jmp    8ba <init_module+0x66>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:496
+    } else {
+        result = alloc_chrdev_region(&dev, scull_minor, scull_nr_devs, "scull");
+ 892:	c7 04 24 8e 00 00 00 	movl   $0x8e,(%esp)
+			895: R_386_32	.rodata.str1.1
+ 899:	8b 0d 00 00 00 00    	mov    0x0,%ecx
+			89b: R_386_32	scull_nr_devs
+ 89f:	8b 15 00 00 00 00    	mov    0x0,%edx
+			8a1: R_386_32	scull_minor
+ 8a5:	8d 45 f0             	lea    -0x10(%ebp),%eax
+ 8a8:	e8 fc ff ff ff       	call   8a9 <init_module+0x55>
+			8a9: R_386_PC32	alloc_chrdev_region
+ 8ad:	89 c3                	mov    %eax,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:497
+        scull_major = MAJOR(dev);
+ 8af:	8b 45 f0             	mov    -0x10(%ebp),%eax
+ 8b2:	c1 e8 14             	shr    $0x14,%eax
+ 8b5:	a3 00 00 00 00       	mov    %eax,0x0
+			8b6: R_386_32	scull_major
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:499
+    }
+    if(result < 0) {
+ 8ba:	85 db                	test   %ebx,%ebx
+ 8bc:	79 1a                	jns    8d8 <init_module+0x84>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:500
+        printk(KERN_WARNING "scull: can't get major %d\n", scull_major);
+ 8be:	a1 00 00 00 00       	mov    0x0,%eax
+			8bf: R_386_32	scull_major
+ 8c3:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 8c7:	c7 04 24 94 00 00 00 	movl   $0x94,(%esp)
+			8ca: R_386_32	.rodata.str1.1
+ 8ce:	e8 fc ff ff ff       	call   8cf <init_module+0x7b>
+			8cf: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:501
+        return result;
+ 8d3:	e9 a7 01 00 00       	jmp    a7f <init_module+0x22b>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:508
+        
+    /*
+     * allocate the devices -- we can't have them static, as the number
+     * can be specified at load time
+     */
+    scull_devices = kmalloc(scull_nr_devs * sizeof(struct scull_dev), GFP_KERNEL);
+ 8d8:	6b 05 00 00 00 00 64 	imul   $0x64,0x0,%eax
+			8da: R_386_32	scull_nr_devs
+kmalloc():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/slub_def.h:283
+ 8df:	ba d0 00 00 00       	mov    $0xd0,%edx
+ 8e4:	e8 fc ff ff ff       	call   8e5 <init_module+0x91>
+			8e5: R_386_PC32	__kmalloc
+scull_init_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:508
+ 8e9:	a3 00 00 00 00       	mov    %eax,0x0
+			8ea: R_386_32	scull_devices
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:509
+    if (!scull_devices) {
+ 8ee:	85 c0                	test   %eax,%eax
+ 8f0:	0f 84 6a 01 00 00    	je     a60 <init_module+0x20c>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:513
+        result = -ENOMEM;
+        goto fail;
+    }
+    memset(scull_devices, 0, scull_nr_devs * sizeof(struct scull_dev));
+ 8f6:	6b 0d 00 00 00 00 64 	imul   $0x64,0x0,%ecx
+			8f8: R_386_32	scull_nr_devs
+ 8fd:	ba 00 00 00 00       	mov    $0x0,%edx
+ 902:	e8 fc ff ff ff       	call   903 <init_module+0xaf>
+			903: R_386_PC32	memset
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:516
+
+    /* Initialize each device. */
+    for (i = 0; i < scull_nr_devs; i++) {
+ 907:	83 3d 00 00 00 00 00 	cmpl   $0x0,0x0
+			909: R_386_32	scull_nr_devs
+ 90e:	0f 8e ab 00 00 00    	jle    9bf <init_module+0x16b>
+ 914:	bf 00 00 00 00       	mov    $0x0,%edi
+ 919:	be 00 00 00 00       	mov    $0x0,%esi
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:517
+        scull_devices[i].quantum = scull_quantum;
+ 91e:	89 f8                	mov    %edi,%eax
+ 920:	03 05 00 00 00 00    	add    0x0,%eax
+			922: R_386_32	scull_devices
+ 926:	8b 15 00 00 00 00    	mov    0x0,%edx
+			928: R_386_32	scull_quantum
+ 92c:	89 50 04             	mov    %edx,0x4(%eax)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:518
+        scull_devices[i].qset = scull_qset;
+ 92f:	8b 15 00 00 00 00    	mov    0x0,%edx
+			931: R_386_32	scull_qset
+ 935:	89 50 08             	mov    %edx,0x8(%eax)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:519
+        mutex_init(&scull_devices[i].mutex);
+ 938:	83 c0 14             	add    $0x14,%eax
+ 93b:	b9 0c 00 00 00       	mov    $0xc,%ecx
+			93c: R_386_32	.bss
+ 940:	ba b2 00 00 00       	mov    $0xb2,%edx
+			941: R_386_32	.rodata.str1.1
+ 945:	e8 fc ff ff ff       	call   946 <init_module+0xf2>
+			946: R_386_PC32	__mutex_init
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:520
+        scull_setup_cdev(&scull_devices[i], i);
+ 94a:	89 fb                	mov    %edi,%ebx
+ 94c:	03 1d 00 00 00 00    	add    0x0,%ebx
+			94e: R_386_32	scull_devices
+scull_setup_cdev():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:474
+/*
+ * Set up the char_dev structure for this device.
+ */
+static void scull_setup_cdev(struct scull_dev *dev, int index)
+{
+    int err, devno = MKDEV(scull_major, scull_minor + index);
+ 952:	89 f2                	mov    %esi,%edx
+ 954:	03 15 00 00 00 00    	add    0x0,%edx
+			956: R_386_32	scull_minor
+ 95a:	a1 00 00 00 00       	mov    0x0,%eax
+			95b: R_386_32	scull_major
+ 95f:	c1 e0 14             	shl    $0x14,%eax
+ 962:	09 c2                	or     %eax,%edx
+ 964:	89 55 e8             	mov    %edx,-0x18(%ebp)
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:476
+
+    cdev_init(&dev->cdev, &scull_fops);
+ 967:	8d 43 28             	lea    0x28(%ebx),%eax
+ 96a:	89 45 ec             	mov    %eax,-0x14(%ebp)
+ 96d:	ba 00 00 00 00       	mov    $0x0,%edx
+			96e: R_386_32	scull_fops
+ 972:	e8 fc ff ff ff       	call   973 <init_module+0x11f>
+			973: R_386_PC32	cdev_init
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:477
+    dev->cdev.owner = THIS_MODULE;
+ 977:	c7 43 4c 00 00 00 00 	movl   $0x0,0x4c(%ebx)
+			97a: R_386_32	__this_module
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:478
+    dev->cdev.ops = &scull_fops;
+ 97e:	c7 43 50 00 00 00 00 	movl   $0x0,0x50(%ebx)
+			981: R_386_32	scull_fops
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:479
+    err = cdev_add(&dev->cdev, devno, 1);
+ 985:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 98a:	8b 55 e8             	mov    -0x18(%ebp),%edx
+ 98d:	8b 45 ec             	mov    -0x14(%ebp),%eax
+ 990:	e8 fc ff ff ff       	call   991 <init_module+0x13d>
+			991: R_386_PC32	cdev_add
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:480
+    if (err)
+ 995:	85 c0                	test   %eax,%eax
+ 997:	74 14                	je     9ad <init_module+0x159>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:481
+        printk(KERN_NOTICE "Error %d adding scull%d", err, index);
+ 999:	89 74 24 08          	mov    %esi,0x8(%esp)
+ 99d:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 9a1:	c7 04 24 ca 00 00 00 	movl   $0xca,(%esp)
+			9a4: R_386_32	.rodata.str1.1
+ 9a8:	e8 fc ff ff ff       	call   9a9 <init_module+0x155>
+			9a9: R_386_PC32	printk
+scull_init_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:516
+        goto fail;
+    }
+    memset(scull_devices, 0, scull_nr_devs * sizeof(struct scull_dev));
+
+    /* Initialize each device. */
+    for (i = 0; i < scull_nr_devs; i++) {
+ 9ad:	83 c6 01             	add    $0x1,%esi
+ 9b0:	83 c7 64             	add    $0x64,%edi
+ 9b3:	39 35 00 00 00 00    	cmp    %esi,0x0
+			9b5: R_386_32	scull_nr_devs
+ 9b9:	0f 8f 5f ff ff ff    	jg     91e <init_module+0xca>
+create_proc_read_entry():
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/proc_fs.h:162
+
+static inline struct proc_dir_entry *create_proc_read_entry(const char *name,
+	umode_t mode, struct proc_dir_entry *base, 
+	read_proc_t *read_proc, void * data)
+{
+	struct proc_dir_entry *res=create_proc_entry(name,mode,base);
+ 9bf:	b9 00 00 00 00       	mov    $0x0,%ecx
+ 9c4:	ba 00 00 00 00       	mov    $0x0,%edx
+ 9c9:	b8 63 00 00 00       	mov    $0x63,%eax
+			9ca: R_386_32	.rodata.str1.1
+ 9ce:	e8 fc ff ff ff       	call   9cf <init_module+0x17b>
+			9cf: R_386_PC32	create_proc_entry
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/proc_fs.h:163
+	if (res) {
+ 9d3:	85 c0                	test   %eax,%eax
+ 9d5:	74 10                	je     9e7 <init_module+0x193>
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/proc_fs.h:164
+		res->read_proc=read_proc;
+ 9d7:	c7 40 34 00 00 00 00 	movl   $0x0,0x34(%eax)
+			9da: R_386_32	scull_read_procmem
+/usr/src/linux-headers-3.5.0-23-generic/include/linux/proc_fs.h:165
+		res->data=data;
+ 9de:	c7 40 30 00 00 00 00 	movl   $0x0,0x30(%eax)
+ 9e5:	eb 0c                	jmp    9f3 <init_module+0x19f>
+scull_create_proc():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:213
+
+    proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
+                        NULL /* parent dir */, scull_read_procmem,
+                        NULL /* client data */);
+    if(!proc_scullmem)
+        printk(KERN_ERR "create scullmem failed!\n");
+ 9e7:	c7 04 24 e5 00 00 00 	movl   $0xe5,(%esp)
+			9ea: R_386_32	.rodata.str1.1
+ 9ee:	e8 fc ff ff ff       	call   9ef <init_module+0x19b>
+			9ef: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:215
+
+    proc_scullseq = create_proc_entry("scullseq", 0, NULL);
+ 9f3:	b9 00 00 00 00       	mov    $0x0,%ecx
+ 9f8:	ba 00 00 00 00       	mov    $0x0,%edx
+ 9fd:	b8 6c 00 00 00       	mov    $0x6c,%eax
+			9fe: R_386_32	.rodata.str1.1
+ a02:	e8 fc ff ff ff       	call   a03 <init_module+0x1af>
+			a03: R_386_PC32	create_proc_entry
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:216
+    if (proc_scullseq)
+ a07:	85 c0                	test   %eax,%eax
+ a09:	74 09                	je     a14 <init_module+0x1c0>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:217
+        proc_scullseq->proc_fops = &scull_seq_proc_ops;
+ a0b:	c7 40 20 80 00 00 00 	movl   $0x80,0x20(%eax)
+			a0e: R_386_32	.data
+ a12:	eb 0c                	jmp    a20 <init_module+0x1cc>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:219
+    else 
+        printk(KERN_ERR "create scullseq failed!\n");
+ a14:	c7 04 24 01 01 00 00 	movl   $0x101,(%esp)
+			a17: R_386_32	.rodata.str1.1
+ a1b:	e8 fc ff ff ff       	call   a1c <init_module+0x1c8>
+			a1c: R_386_PC32	printk
+scull_init_module():
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:527
+ 
+#ifdef SCULL_DEBUG
+    scull_create_proc();
+#endif
+
+    PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, quantum %d, quantum set %d\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
+ a20:	a1 00 00 00 00       	mov    0x0,%eax
+			a21: R_386_32	scull_qset
+ a25:	89 44 24 14          	mov    %eax,0x14(%esp)
+ a29:	a1 00 00 00 00       	mov    0x0,%eax
+			a2a: R_386_32	scull_quantum
+ a2e:	89 44 24 10          	mov    %eax,0x10(%esp)
+ a32:	a1 00 00 00 00       	mov    0x0,%eax
+			a33: R_386_32	scull_nr_devs
+ a37:	89 44 24 0c          	mov    %eax,0xc(%esp)
+ a3b:	a1 00 00 00 00       	mov    0x0,%eax
+			a3c: R_386_32	scull_minor
+ a40:	89 44 24 08          	mov    %eax,0x8(%esp)
+ a44:	a1 00 00 00 00       	mov    0x0,%eax
+			a45: R_386_32	scull_major
+ a49:	89 44 24 04          	mov    %eax,0x4(%esp)
+ a4d:	c7 04 24 80 00 00 00 	movl   $0x80,(%esp)
+			a50: R_386_32	.rodata.str1.4
+ a54:	e8 fc ff ff ff       	call   a55 <init_module+0x201>
+			a55: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:528
+    return 0;
+ a59:	bb 00 00 00 00       	mov    $0x0,%ebx
+ a5e:	eb 1f                	jmp    a7f <init_module+0x22b>
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:531
+
+fail:
+    printk(KERN_ERR "scull: probe failed, major %d\n", scull_major);
+ a60:	a1 00 00 00 00       	mov    0x0,%eax
+			a61: R_386_32	scull_major
+ a65:	89 44 24 04          	mov    %eax,0x4(%esp)
+ a69:	c7 04 24 d8 00 00 00 	movl   $0xd8,(%esp)
+			a6c: R_386_32	.rodata.str1.4
+ a70:	e8 fc ff ff ff       	call   a71 <init_module+0x21d>
+			a71: R_386_PC32	printk
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:532
+    scull_cleanup_module();
+ a75:	e8 fc ff ff ff       	call   a76 <init_module+0x222>
+			a76: R_386_PC32	scull_cleanup_module
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:533
+    return result;
+ a7a:	bb f4 ff ff ff       	mov    $0xfffffff4,%ebx
+/mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:534
+}
+ a7f:	89 d8                	mov    %ebx,%eax
+ a81:	83 c4 24             	add    $0x24,%esp
+ a84:	5b                   	pop    %ebx
+ a85:	5e                   	pop    %esi
+ a86:	5f                   	pop    %edi
+ a87:	5d                   	pop    %ebp
+ a88:	c3                   	ret    

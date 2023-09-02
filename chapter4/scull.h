@@ -62,4 +62,25 @@ struct scull_dev {
     struct cdev cdev;           /* Char device structure */
 };
  
+/*
+ * Ioctl definitions
+ */
+
+/* Use 'k' as magic number */
+#define SCULL_IOC_MAGIC  'c'
+/* Please use a different 8-bit number in your code */
+
+/* If you are adding new ioctl's to the kernel, you should use the _IO
+ * macros defined in <linux/ioctl.h>:
+ *   _IO    an ioctl with no parameters
+ *   _IOW   an ioctl with write parameters (copy_from_user)
+ *   _IOR   an ioctl with read parameters  (copy_to_user)
+ *   _IOWR  an ioctl with both write and read parameters.
+ */
+#define SCULL_IOC_MAKE_FAULTY_WRITE    _IO(SCULL_IOC_MAGIC, 0)
+/* define the max command of ioctrl. 
+ * here is the last one is 0 in MAKE_FAULTY_WRITE 
+ */
+#define SCULL_IOC_MAX    0
+
 #endif
