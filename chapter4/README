@@ -27,3 +27,5 @@ because ubuntu is login as graphical interface. using CTRL+ALT+F7 can switch to 
 	notice: the address/offsets are different from every build. 
 			so the 0x43/0x76, 0xb7, 0xfa here may be not found in your build.
 			please use your address/offset 
+
+	more information of how the location the oops, please refer to https://www.kernel.org/doc/html/latest/admin-guide/bug-hunting.html
