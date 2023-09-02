@@ -1,7 +1,7 @@
 #! /bin/sh
 module="scull"
 device="scull"
-mode="664"
+mode="666"
 
 # invoke insmod with all arguments we got
 # and use a pathname, as newer modutils don't look in by default.
