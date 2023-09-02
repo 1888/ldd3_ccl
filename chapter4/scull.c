@@ -7,7 +7,10 @@
 #include <linux/fs.h>       /* register_chrdev_region */
 #include <linux/errno.h>    /* error codes */
 #include <linux/types.h>    /* size_t */
+#ifdef SCULL_DEBUG
 #include <linux/proc_fs.h>  /* proc file */
+#include <linux/seq_file.h>  /* seqence file */
+#endif
 #include <linux/fcntl.h>    /* O_ACCMODE */
 #include <linux/cdev.h>
 
@@ -101,16 +104,128 @@ int scull_read_procmem(char* buf, char** start, off_t offset,
     return len;
 }
 
+/* The sfile argument can almost always be ignored. pos is an integer position indicating where the reading should start.
+ * Since seq_file implementations typically step through a sequence of interesting items,
+ * the position is often interpreted as a cursor pointing to the next item in the sequence.
+ * The scull driver interprets each device as one item in the sequence,
+ * so the incoming pos is simply an index into the scull_devices array.
+ */ 
+static void *scull_seq_start(struct seq_file *s, loff_t *pos)
+{
+    if (*pos >= scull_nr_devs)
+        return NULL; /* No more to read */
+    return scull_devices + *pos;
+}
+
+/*
+ * v is the iterator as returned from the previous call to start or next,
+ * pos is the current position in the file
+ * next should increment the value pointed to by pos
+ * depending on how your iterator works, you might (though probably won’t) want to increment pos by more than one.
+ */
+static void *scull_seq_next(struct seq_file *s, void *v, loff_t *pos)
+{
+    (*pos)++;
+    if (*pos >= scull_nr_devs)
+        return NULL;
+    return scull_devices + *pos;
+}
+
+/* When the kernel is done with the iterator, it calls stop to clean up
+ * The scull implementation has no cleanup work to do, so its stop method is empty.
+ */
+static void scull_seq_stop(struct seq_file *s, void *v)
+{
+	/* Actually, there's nothing to do here */
+}
+
+/*
+ * In between these calls, the kernel calls the show method to actually output something interesting to the user space. */
+static int scull_seq_show(struct seq_file *s, void *v)
+{
+    /* Here, we finally interpret our “iterator” value, 
+     * which is simply a pointer to a scull_dev structure.
+     */
+	struct scull_dev *dev = (struct scull_dev *) v;
+	struct scull_qset *d;
+	int i;
+
+	if (mutex_lock_interruptible(&dev->mutex))
+		return -ERESTARTSYS;
+	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
+			(int) (dev - scull_devices), dev->qset,
+			dev->quantum, dev->size);
+	for (d = dev->data; d; d = d->next) { /* scan the list */
+		seq_printf(s, "  item at %p, qset at %p\n", d, d->data);
+		if (d->data && !d->next) /* dump only the last item */
+			for (i = 0; i < dev->qset; i++) {
+				if (d->data[i])
+					seq_printf(s, "    % 4i: %8p\n",
+							i, d->data[i]);
+			}
+	}
+	mutex_unlock(&dev->mutex);
+	return 0;
+}
+
+/*
+ * Now that it has a full set of iterator operations, 
+ * scull must package them up and connect them to a file in /proc 
+ */
+static struct seq_operations scull_seq_ops = {
+	.start = scull_seq_start,
+	.next  = scull_seq_next,
+	.stop  = scull_seq_stop,
+	.show  = scull_seq_show
+}; 
+
+/* create an open method that connects the file to the seq_file operations
+ * */
+static int scull_proc_open(struct inode *inode, struct file *file)
+{
+    return seq_open(file, &scull_seq_ops);
+}
+
+/* open is the only file operation we must implement ourselves, 
+ * so we can now set up our file_operations structure
+ * Here we specify our own open method, but use the canned methods seq_read, seq_lseek, and seq_release for everything else
+ */
+static struct file_operations scull_seq_proc_ops = {
+    .owner = THIS_MODULE,
+    .open = scull_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = seq_release
+};
+
+/*
+ * create two proc files in different ways
+ * */
 static void scull_create_proc(void)
 {
     struct proc_dir_entry * proc_scullmem = NULL;
+    struct proc_dir_entry * proc_scullseq = NULL;
 
     proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
                         NULL /* parent dir */, scull_read_procmem,
                         NULL /* client data */);
     if(!proc_scullmem)
         printk(KERN_ERR "create scullmem failed!\n");
+
+    proc_scullseq = create_proc_entry("scullseq", 0, NULL);
+    if (proc_scullseq)
+        proc_scullseq->proc_fops = &scull_seq_proc_ops;
+    else 
+        printk(KERN_ERR "create scullseq failed!\n");
 }
+
+static void scull_remove_proc(void)
+{
+	/* no problem if it was not registered */
+	remove_proc_entry("scullmem", NULL /* parent dir */);
+	remove_proc_entry("scullseq", NULL);
+}
+
 #endif
 
 /*
@@ -298,7 +413,7 @@ void scull_cleanup_module(void)
         kfree(scull_devices);
     }
 #ifdef SCULL_DEBUG
-    remove_proc_entry("scullmem", NULL /* parent dir */);
+    scull_remove_proc();
 #endif
 
     /* cleanup_module is never called if registering failed */
