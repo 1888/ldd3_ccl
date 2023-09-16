@@ -1,0 +1,31 @@
+1. for chapter4 Makefile, if put ccflags-y just before target modules, the ccflags-y will not work.
+if I put ccflags-y at the head of the Makefile, it works. don't know why. 
+
+2. even if change the current loglevel of /proc/sys/kernel/printk to 8, I cannot see the PDEBUG message
+ to show on the screen. it works only when I login by terminal using CTRL+ALT+F1. I think it maybe 
+because ubuntu is login as graphical interface. using CTRL+ALT+F7 can switch to graphical interface. 
+
+3. use ioctl to make an oops. 
+	./scull_ioctl_app 2
+	here 2 is means the oops is on /dev/scull2
+
+4. how to location the issue from the oops info?
+	step1. location the function by below information.
+		"EIP is at scull_ioctl+0x43/0x76 [scull]"
+
+	step2. disassemble the scull.o 
+		objdump -r -S -l --disassemble scull.o
+
+	step3. found 0x5e offset in scull_ioctl
+		scull_ioctl is at 0xb7.
+			000000b7 <scull_ioctl>:
+		the EIP is at 0xb7 + 0x43 = 0xFA. here it is scull.c:390 in corresponding.
+			 /mnt/hgfs/01.sharedfolder/ldd3_kernel_3.5.0/chapter4/scull.c:390
+ 			  *(int*)0 = 0;
+			  fa:   c7 05 00 00 00 00 00    movl   $0x0,0x0
+
+	notice: the address/offsets are different from every build. 
+			so the 0x43/0x76, 0xb7, 0xfa here may be not found in your build.
+			please use your address/offset 
+
+	more information of how the location the oops, please refer to https://www.kernel.org/doc/html/latest/admin-guide/bug-hunting.html
