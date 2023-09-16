@@ -21,6 +21,7 @@
     #include <linux/uaccess.h>    /* copy_*_user */
 #endif
 
+#include <linux/semaphore.h>
 #include "scull.h"
 
 /*
@@ -82,7 +83,7 @@ int scull_read_procmem(char* buf, char** start, off_t offset,
     for (i = 0; i < scull_nr_devs && len <= limit; i++) {
         struct scull_dev *d = &scull_devices[i];
         struct scull_qset *qs = d->data;
-        if (mutex_lock_interruptible(&d->mutex))
+        if (down_interruptible(&d->sem))
             return -ERESTARTSYS;
 
         len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
@@ -98,7 +99,7 @@ int scull_read_procmem(char* buf, char** start, off_t offset,
                                j, qs->data[j]);
                 }
         } 
-        mutex_unlock(&d->mutex);
+        up(&d->sem);
     }
     *eof = 1;
     return len;
@@ -150,7 +151,7 @@ static int scull_seq_show(struct seq_file *s, void *v)
 	struct scull_qset *d;
 	int i;
 
-	if (mutex_lock_interruptible(&dev->mutex))
+	if (down_interruptible(&dev->sem))
 		return -ERESTARTSYS;
 	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
 			(int) (dev - scull_devices), dev->qset,
@@ -164,7 +165,7 @@ static int scull_seq_show(struct seq_file *s, void *v)
 							i, d->data[i]);
 			}
 	}
-	mutex_unlock(&dev->mutex);
+	up(&dev->sem);
 	return 0;
 }
 
@@ -240,10 +241,10 @@ int scull_open(struct inode *inode, struct file *filp)
 
     /* now trim to 0 the length of the deivce if open was write-only */
     if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
-        if (mutex_lock_interruptible(&dev->mutex))
+        if (down_interruptible(&dev->sem))
             return -ERESTARTSYS;
         scull_trim(dev);
-        mutex_unlock(&dev->mutex);
+        up(&dev->sem);
     }
     return 0;
 }
@@ -291,7 +292,7 @@ ssize_t scull_read(struct file *filp, char __user *buf, size_t count, loff_t *f_
     int item, s_pos, q_pos, rest;
     ssize_t retval = 0;
 
-    if (mutex_lock_interruptible(&dev->mutex))
+    if (down_interruptible(&dev->sem))
         return -ERESTARTSYS;
     if (*f_pos >= dev->size)
         goto out;
@@ -322,7 +323,7 @@ ssize_t scull_read(struct file *filp, char __user *buf, size_t count, loff_t *f_
     retval = count;
 
 out:
-    mutex_unlock(&dev->mutex);
+    up(&dev->sem);
     return retval;
 }
 
@@ -336,7 +337,7 @@ ssize_t scull_write(struct file *filp, const char __user *buf, size_t count, lof
     int item, s_pos, q_pos, rest;
     ssize_t retval = -ENOMEM;
 
-    if (mutex_lock_interruptible(&dev->mutex))
+    if (down_interruptible(&dev->sem))
         return -ERESTARTSYS;
 
     /* find listitem, qset index, and offset in the quantum */
@@ -380,7 +381,7 @@ ssize_t scull_write(struct file *filp, const char __user *buf, size_t count, lof
     if (dev->size < *f_pos)
         dev->size = *f_pos;
 out:
-    mutex_unlock(&dev->mutex);
+    up(&dev->sem);
     return retval;
 }
 
@@ -516,7 +517,7 @@ int scull_init_module(void)
     for (i = 0; i < scull_nr_devs; i++) {
         scull_devices[i].quantum = scull_quantum;
         scull_devices[i].qset = scull_qset;
-        mutex_init(&scull_devices[i].mutex);
+        sema_init(&scull_devices[i].sem, 1); // initialized to 1 as mutex
         scull_setup_cdev(&scull_devices[i], i);
     }
  

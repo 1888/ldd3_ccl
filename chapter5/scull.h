@@ -58,7 +58,7 @@ struct scull_dev {
     int qset;                   /* the current array size */
     unsigned long size;         /* amount of data stored here */
     unsigned long access_key;   /* used by sculluid and scullpriv */
-    struct mutex mutex;         /* mutual exclusion semaphore */
+    struct semaphore sem;       /* mutual exclusion semaphore */
     struct cdev cdev;           /* Char device structure */
 };
  
