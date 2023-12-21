@@ -73,6 +73,7 @@ int scull_trim(struct scull_dev *dev)
 }
 
 #ifdef SCULL_DEBUG
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
 int scull_read_procmem(char* buf, char** start, off_t offset,
         int count, int *eof, void *data)
 {
@@ -103,6 +104,12 @@ int scull_read_procmem(char* buf, char** start, off_t offset,
     *eof = 1;
     return len;
 }
+#else
+ssize_t scull_read_procmem (struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+{
+	
+}
+#endif
 
 /* The sfile argument can almost always be ignored. pos is an integer position indicating where the reading should start.
  * Since seq_file implementations typically step through a sequence of interesting items,
@@ -198,6 +205,13 @@ static struct file_operations scull_seq_proc_ops = {
     .release = seq_release
 };
 
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+struct file_operations scull_proc_fops = {
+	.read = scull_read_procmem
+};
+#endif
+
 /*
  * create two proc files in different ways
  * */
@@ -206,9 +220,14 @@ static void scull_create_proc(void)
     struct proc_dir_entry * proc_scullmem = NULL;
     struct proc_dir_entry * proc_scullseq = NULL;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
     proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
                         NULL /* parent dir */, scull_read_procmem,
                         NULL /* client data */);
+#else
+    proc_scullmem = proc_create("scullmem", 0, NULL, &scull_proc_fops);
+#endif
+    
     if(!proc_scullmem)
         printk(KERN_ERR "create scullmem failed!\n");
 
