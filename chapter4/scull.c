@@ -105,9 +105,44 @@ int scull_read_procmem(char* buf, char** start, off_t offset,
     return len;
 }
 #else
-ssize_t scull_read_procmem (struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, loff_t *f_pos)
 {
+	int i,j;
+	ssize_t len=0;
+    	int limit = count - 80; /* Don't print more than this */
+	char buf[1024];
+
+	if (*f_pos > 0 )
+		return 0;
 	
+	memset(buf, 0 , 1024);
+
+	for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+		struct scull_dev *d = &scull_devices[i];
+		struct scull_qset *qs = d->data;
+		if (mutex_lock_interruptible(&d->mutex))
+			return -ERESTARTSYS;
+
+		len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
+					i, d->qset, d->quantum, d->size);
+
+		for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+			len += sprintf(buf+len, " item at %p, qset at %p\n",
+						qs, qs->data);
+			if (qs->data && !qs->next) /* dump only the last item */
+				for (j = 0; j < d->qset; j++) {
+					if (qs->data[j])
+						len += sprintf(buf + len, "\t%4i:%8p\n",
+									j, qs->data[j]);
+				}
+		} 
+		mutex_unlock(&d->mutex);
+	}
+
+	copy_to_user(ubuf, buf, len);
+	*f_pos = len;
+	printk(KERN_INFO "scull_read_procmem return %u!\n", len);
+	return len;
 }
 #endif
 
@@ -208,6 +243,7 @@ static struct file_operations scull_seq_proc_ops = {
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
 struct file_operations scull_proc_fops = {
+	.owner = THIS_MODULE,
 	.read = scull_read_procmem
 };
 #endif
@@ -217,25 +253,29 @@ struct file_operations scull_proc_fops = {
  * */
 static void scull_create_proc(void)
 {
-    struct proc_dir_entry * proc_scullmem = NULL;
-    struct proc_dir_entry * proc_scullseq = NULL;
+	struct proc_dir_entry * proc_scullmem = NULL;
+	struct proc_dir_entry * proc_scullseq = NULL;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
-    proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
-                        NULL /* parent dir */, scull_read_procmem,
-                        NULL /* client data */);
+	proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
+		NULL /* parent dir */, scull_read_procmem,
+		NULL /* client data */);
 #else
-    proc_scullmem = proc_create("scullmem", 0, NULL, &scull_proc_fops);
+	proc_scullmem = proc_create("scullmem", 0, NULL, &scull_proc_fops);
 #endif
-    
-    if(!proc_scullmem)
-        printk(KERN_ERR "create scullmem failed!\n");
 
-    proc_scullseq = create_proc_entry("scullseq", 0, NULL);
-    if (proc_scullseq)
-        proc_scullseq->proc_fops = &scull_seq_proc_ops;
-    else 
-        printk(KERN_ERR "create scullseq failed!\n");
+	if(!proc_scullmem)
+		printk(KERN_ERR "create scullmem failed!\n");
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
+	proc_scullseq = create_proc_entry("scullseq", 0, NULL);
+	if (proc_scullseq)
+		proc_scullseq->proc_fops = &scull_seq_proc_ops;
+	else 
+		printk(KERN_ERR "create scullseq failed!\n");
+#else
+	proc_scullseq = proc_create("scullseq", 0, NULL, &scull_seq_proc_ops);
+#endif
 }
 
 static void scull_remove_proc(void)
