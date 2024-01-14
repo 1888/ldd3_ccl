@@ -110,29 +110,37 @@ ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, 
 	int i,j;
 	ssize_t len=0;
     	int limit = count - 80; /* Don't print more than this */
-	char buf[1024];
+	char* buf;
+	ssize_t ret;
 
+	printk(KERN_INFO "scull_read_procmem count=%lu, pos=%lld!\n", count, *f_pos);
 	if (*f_pos > 0 )
-		return 0;
-	
-	memset(buf, 0 , 1024);
+		return 0; /* If the value is 0, end-of-file was reached (and no data was read). */
+
+	buf = kzalloc(4096, GFP_KERNEL);
+	if (!buf) {
+		printk(KERN_ERR "scull_read_procmem allocate memory failed!\n");
+		return -ENOMEM;
+	}
 
 	for (i = 0; i < scull_nr_devs && len <= limit; i++) {
 		struct scull_dev *d = &scull_devices[i];
 		struct scull_qset *qs = d->data;
-		if (mutex_lock_interruptible(&d->mutex))
-			return -ERESTARTSYS;
-
-		len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
-					i, d->qset, d->quantum, d->size);
+		if (mutex_lock_interruptible(&d->mutex)) {
+			ret = -ERESTARTSYS;
+			goto free_buf;
+		}
+		
+		len += sprintf(buf+len, "\nDevice %i: each qset has %i quantums, each quantum has %i bytes, "
+			"total bytes in the device: %li\n", i, d->qset, d->quantum, d->size);
 
 		for(; qs && len <= limit; qs = qs->next) {/* scan the list */
-			len += sprintf(buf+len, " item at %p, qset at %p\n",
+			len += sprintf(buf+len, " item at %p, qset at %p. quantums in this qset:\n",
 						qs, qs->data);
 			if (qs->data && !qs->next) /* dump only the last item */
 				for (j = 0; j < d->qset; j++) {
 					if (qs->data[j])
-						len += sprintf(buf + len, "\t%4i:%8p\n",
+						len += sprintf(buf + len, "\tquantum[%4i] address: %p\n",
 									j, qs->data[j]);
 				}
 		} 
@@ -141,8 +149,12 @@ ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, 
 
 	copy_to_user(ubuf, buf, len);
 	*f_pos = len;
-	printk(KERN_INFO "scull_read_procmem return %u!\n", len);
-	return len;
+	ret = len;
+
+free_buf:
+	kfree(buf);
+	printk(KERN_INFO "scull_read_procmem return %lu, pos = %lld!\n", ret, *f_pos);
+	return ret;
 }
 #endif
 
@@ -241,7 +253,7 @@ static struct file_operations scull_seq_proc_ops = {
 };
 
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
 struct file_operations scull_proc_fops = {
 	.owner = THIS_MODULE,
 	.read = scull_read_procmem
@@ -256,7 +268,7 @@ static void scull_create_proc(void)
 	struct proc_dir_entry * proc_scullmem = NULL;
 	struct proc_dir_entry * proc_scullseq = NULL;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
 	proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
 		NULL /* parent dir */, scull_read_procmem,
 		NULL /* client data */);
@@ -267,7 +279,7 @@ static void scull_create_proc(void)
 	if(!proc_scullmem)
 		printk(KERN_ERR "create scullmem failed!\n");
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
 	proc_scullseq = create_proc_entry("scullseq", 0, NULL);
 	if (proc_scullseq)
 		proc_scullseq->proc_fops = &scull_seq_proc_ops;
@@ -312,6 +324,12 @@ int scull_release (struct inode *inode, struct file *filp)
     return 0;
 }
 
+/*
+* @n: num of quantum_set
+*
+* if @dev->data is NULL, allocate the first quantum set.
+* then move the pointer @n times to  point to the @n+1 quantum set
+*/
 struct scull_qset *scull_follow(struct scull_dev *dev, int n)
 {
     struct scull_qset *qs = dev->data;
@@ -391,7 +409,7 @@ ssize_t scull_write(struct file *filp, const char __user *buf, size_t count, lof
     struct scull_qset *dptr; /* the first listitem */
     int quantum_size = dev->quantum; //bytes of a quantum
     int qset_size = dev->qset;  //num of quantum of a quantum set
-    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+    int item_size = quantum_size * qset_size; /* how many bytes in a listitem(quantum set) */
     int item, s_pos, q_pos, rest;
     ssize_t retval = -ENOMEM;
 
@@ -583,7 +601,7 @@ int scull_init_module(void)
     scull_create_proc();
 #endif
 
-    PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, quantum %d, quantum set %d\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
+    PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, each quantum has %d bytes, a quantum set has %d quantums\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
     return 0;
 
 fail:
