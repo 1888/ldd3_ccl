@@ -49,7 +49,7 @@
  * @data: an array of pointers, which point to a quantum
  * @next: point to the next scull_qset
  *
- * the size of @data is defined by scull_dev->qset (default SCULL_QUANTUM 4000). 
+ * the size of @data is defined by scull_dev->qset (default SCULL_QUANTUM 4000).
  * the size of each quantum is defined by scull_dev->quantum (default SCULL_QSET 1000).
  * so the total size of a quantum_set is scull_dev->qset * scull_dev->quantum.
  */

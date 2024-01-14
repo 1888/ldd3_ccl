@@ -109,7 +109,7 @@ ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, 
 {
 	int i,j;
 	ssize_t len=0;
-    	int limit = count - 80; /* Don't print more than this */
+	int limit = count - 80; /* Don't print more than this */
 	char* buf;
 	ssize_t ret;
 
@@ -130,7 +130,7 @@ ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, 
 			ret = -ERESTARTSYS;
 			goto free_buf;
 		}
-		
+
 		len += sprintf(buf+len, "\nDevice %i: each qset has %i quantums, each quantum has %i bytes, "
 			"total bytes in the device: %li\n", i, d->qset, d->quantum, d->size);
 
@@ -283,7 +283,7 @@ static void scull_create_proc(void)
 	proc_scullseq = create_proc_entry("scullseq", 0, NULL);
 	if (proc_scullseq)
 		proc_scullseq->proc_fops = &scull_seq_proc_ops;
-	else 
+	else
 		printk(KERN_ERR "create scullseq failed!\n");
 #else
 	proc_scullseq = proc_create("scullseq", 0, NULL, &scull_seq_proc_ops);
