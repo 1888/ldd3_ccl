@@ -553,7 +553,6 @@ static void scull_setup_cdev(struct scull_dev *dev, int index)
 
     cdev_init(&dev->cdev, &scull_fops);
     dev->cdev.owner = THIS_MODULE;
-    dev->cdev.ops = &scull_fops;
     err = cdev_add(&dev->cdev, devno, 1);
     if (err)
         printk(KERN_NOTICE "Error %d adding scull%d", err, index);
@@ -561,54 +560,57 @@ static void scull_setup_cdev(struct scull_dev *dev, int index)
 
 int scull_init_module(void)
 {
-    int result, i;
-    dev_t dev = 0;
+	int result, i;
+	dev_t dev = 0;
 
-    /* Get a range of minor numbers to work with, asking for a
-     * dynamic major unless directed otherwise at load time.
-     */
-    if (scull_major) {
-        dev = MKDEV(scull_major, scull_minor);
-        result = register_chrdev_region(dev, scull_nr_devs, "scull");
-    } else {
-        result = alloc_chrdev_region(&dev, scull_minor, scull_nr_devs, "scull");
-        scull_major = MAJOR(dev);
-    }
-    if(result < 0) {
-        printk(KERN_WARNING "scull: can't get major %d\n", scull_major);
-        return result;
-    }
-        
-    /*
-     * allocate the devices -- we can't have them static, as the number
-     * can be specified at load time
-     */
-    scull_devices = kmalloc(scull_nr_devs * sizeof(struct scull_dev), GFP_KERNEL);
-    if (!scull_devices) {
-        result = -ENOMEM;
-        goto fail;
-    }
-    memset(scull_devices, 0, scull_nr_devs * sizeof(struct scull_dev));
+	/* Get a range of minor numbers to work with, asking for a
+	* dynamic major unless directed otherwise at load time.
+	*/
+	if (scull_major) {
+		dev = MKDEV(scull_major, scull_minor);
+		result = register_chrdev_region(dev, scull_nr_devs, "scull");
+	}
+	else {
+		result = alloc_chrdev_region(&dev, scull_minor, scull_nr_devs, "scull");
+		scull_major = MAJOR(dev);
+	}
 
-    /* Initialize each device. */
-    for (i = 0; i < scull_nr_devs; i++) {
-        scull_devices[i].quantum = scull_quantum;
-        scull_devices[i].qset = scull_qset;
-        sema_init(&scull_devices[i].sem, 1); // initialized to 1 as mutex
-        scull_setup_cdev(&scull_devices[i], i);
-    }
- 
+	if(result < 0) {
+		printk(KERN_WARNING "scull: can't get major %d\n", scull_major);
+		return result;
+	}
+
+	/*
+	* allocate the devices -- we can't have them static, as the number
+	* can be specified at load time
+	*/
+	scull_devices = kmalloc(scull_nr_devs * sizeof(struct scull_dev), GFP_KERNEL);
+	if (!scull_devices) {
+		result = -ENOMEM;
+		goto fail;
+	}
+	memset(scull_devices, 0, scull_nr_devs * sizeof(struct scull_dev));
+
+	/* Initialize each device. */
+	for (i = 0; i < scull_nr_devs; i++) {
+		scull_devices[i].quantum = scull_quantum;
+		scull_devices[i].qset = scull_qset;
+		sema_init(&scull_devices[i].sem, 1); // initialized to 1 as mutex
+		scull_setup_cdev(&scull_devices[i], i);
+	}
+
 #ifdef SCULL_DEBUG
-    scull_create_proc();
+	scull_create_proc();
 #endif
 
-    PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, each quantum has %d bytes, a quantum set has %d quantums\n", scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
-    return 0;
+	PDEBUG("probe done, major %d, minor %d, scull_nr_devs %d, each quantum has %d bytes, a quantum set has %d quantums\n",
+		   scull_major, scull_minor, scull_nr_devs, scull_quantum, scull_qset);
+	return 0;
 
 fail:
-    printk(KERN_ERR "scull: probe failed, major %d\n", scull_major);
-    scull_cleanup_module();
-    return result;
+	printk(KERN_ERR "scull: probe failed, major %d\n", scull_major);
+	scull_cleanup_module();
+	return result;
 }
 
 module_init(scull_init_module);
