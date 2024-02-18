@@ -49,61 +49,61 @@ struct scull_dev *scull_devices;    /* allocated in scull_init_module */
  */
 int scull_trim(struct scull_dev *dev)
 {
-    struct scull_qset *next, *dptr;
-    int qset = dev->qset;
-    int i;
+	struct scull_qset *next, *dptr;
+	int qset = dev->qset;
+	int i;
 
-    /* call each memory area (4K) a quantum 
-    * a quantum set has 1000 quantums
-    */
-    for (dptr = dev->data; dptr; dptr = next) {
-        if (dptr->data) { // this quantum set is available
-            for (i = 0; i < qset; i++)
-                kfree(dptr->data[i]); // free each quantum
-            kfree(dptr->data);
-            dptr->data = NULL;
-        }
-        next = dptr->next;
-        kfree(dptr);
-    }
-    dev->size = 0;
-    dev->quantum = scull_quantum;
-    dev->qset = scull_qset;
-    dev->data = NULL;
-    return 0;
+	/* call each memory area (4K) a quantum
+	* a quantum set has 1000 quantums
+	*/
+	for (dptr = dev->data; dptr; dptr = next) {
+		if (dptr->data) { // this quantum set is available
+		for (i = 0; i < qset; i++)
+			kfree(dptr->data[i]); // free each quantum
+			kfree(dptr->data);
+			dptr->data = NULL;
+		}
+		next = dptr->next;
+		kfree(dptr);
+	}
+	dev->size = 0;
+	dev->quantum = scull_quantum;
+	dev->qset = scull_qset;
+	dev->data = NULL;
+	return 0;
 }
 
 #ifdef SCULL_DEBUG
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
 int scull_read_procmem(char* buf, char** start, off_t offset,
         int count, int *eof, void *data)
 {
-    int i,j,len=0;
-    int limit = count - 80; /* Don't print more than this */
+	int i,j,len=0;
+	int limit = count - 80; /* Don't print more than this */
 
-    for (i = 0; i < scull_nr_devs && len <= limit; i++) {
-        struct scull_dev *d = &scull_devices[i];
-        struct scull_qset *qs = d->data;
-        if (down_interruptible(&d->sem))
-            return -ERESTARTSYS;
+	for (i = 0; i < scull_nr_devs && len <= limit; i++) {
+		struct scull_dev *d = &scull_devices[i];
+		struct scull_qset *qs = d->data;
+		if (down_interruptible(&d->sem))
+			return -ERESTARTSYS;
 
-        len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
-                i, d->qset, d->quantum, d->size);
+		len += sprintf(buf+len, "\nDevice %i: qset %i, q %i, sz %li\n",
+					i, d->qset, d->quantum, d->size);
 
-        for(; qs && len <= limit; qs = qs->next) {/* scan the list */
-            len += sprintf(buf+len, " item at %p, qset at %p\n",
-                    qs, qs->data);
-            if (qs->data && !qs->next) /* dump only the last item */
-                for (j = 0; j < d->qset; j++) {
-                    if (qs->data[j])
-                        len += sprintf(buf + len, "\t%4i:%8p\n",
-                               j, qs->data[j]);
-                }
-        } 
-        up(&d->sem);
-    }
-    *eof = 1;
-    return len;
+		for(; qs && len <= limit; qs = qs->next) {/* scan the list */
+			len += sprintf(buf+len, " item at %p, qset at %p\n",
+			qs, qs->data);
+			if (qs->data && !qs->next) /* dump only the last item */
+				for (j = 0; j < d->qset; j++) {
+				if (qs->data[j])
+					len += sprintf(buf + len, "\t%4i:%8p\n",
+								j, qs->data[j]);
+			}
+		}
+		up(&d->sem);
+	}
+	*eof = 1;
+	return len;
 }
 #else
 ssize_t scull_read_procmem (struct file *filp, char __user *ubuf, size_t count, loff_t *f_pos)
@@ -167,9 +167,9 @@ free_buf:
  */ 
 static void *scull_seq_start(struct seq_file *s, loff_t *pos)
 {
-    if (*pos >= scull_nr_devs)
-        return NULL; /* No more to read */
-    return scull_devices + *pos;
+	if (*pos >= scull_nr_devs)
+		return NULL; /* No more to read */
+	return scull_devices + *pos;
 }
 
 /*
@@ -180,10 +180,10 @@ static void *scull_seq_start(struct seq_file *s, loff_t *pos)
  */
 static void *scull_seq_next(struct seq_file *s, void *v, loff_t *pos)
 {
-    (*pos)++;
-    if (*pos >= scull_nr_devs)
-        return NULL;
-    return scull_devices + *pos;
+	(*pos)++;
+	if (*pos >= scull_nr_devs)
+		return NULL;
+	return scull_devices + *pos;
 }
 
 /* When the kernel is done with the iterator, it calls stop to clean up
@@ -238,7 +238,7 @@ static struct seq_operations scull_seq_ops = {
  * */
 static int scull_proc_open(struct inode *inode, struct file *file)
 {
-    return seq_open(file, &scull_seq_ops);
+	return seq_open(file, &scull_seq_ops);
 }
 
 /* open is the only file operation we must implement ourselves, 
@@ -246,11 +246,11 @@ static int scull_proc_open(struct inode *inode, struct file *file)
  * Here we specify our own open method, but use the canned methods seq_read, seq_lseek, and seq_release for everything else
  */
 static struct file_operations scull_seq_proc_ops = {
-    .owner = THIS_MODULE,
-    .open = scull_proc_open,
-    .read = seq_read,
-    .llseek = seq_lseek,
-    .release = seq_release
+	.owner = THIS_MODULE,
+	.open = scull_proc_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = seq_release
 };
 
 
@@ -266,13 +266,13 @@ struct file_operations scull_proc_fops = {
  * */
 static void scull_create_proc(void)
 {
-    struct proc_dir_entry * proc_scullmem = NULL;
-    struct proc_dir_entry * proc_scullseq = NULL;
+	struct proc_dir_entry * proc_scullmem = NULL;
+	struct proc_dir_entry * proc_scullseq = NULL;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
 	proc_scullmem = create_proc_read_entry("scullmem", 0 /* default mode */,
-		NULL /* parent dir */, scull_read_procmem,
-		NULL /* client data */);
+	NULL /* parent dir */, scull_read_procmem,
+	NULL /* client data */);
 #else
 	proc_scullmem = proc_create("scullmem", 0, NULL, &scull_proc_fops);
 #endif
@@ -305,24 +305,29 @@ static void scull_remove_proc(void)
  */
 int scull_open(struct inode *inode, struct file *filp)
 {
-    struct scull_dev *dev;
+	struct scull_dev *dev;
 
-    dev = container_of(inode->i_cdev, struct scull_dev, cdev);
-    filp->private_data = dev;
+	/* identify which device is being opened.
+	* the inode argument has the information we need in the form of
+	* its i_cdev field, which contains the cdev structure we set up before.
+	* we want the scull_dev structure that contians that cdev structure */
+	dev = container_of(inode->i_cdev, struct scull_dev, cdev);
+	filp->private_data = dev;
 
-    /* now trim to 0 the length of the deivce if open was write-only */
-    if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
-        if (down_interruptible(&dev->sem))
-            return -ERESTARTSYS;
-        scull_trim(dev);
-        up(&dev->sem);
-    }
-    return 0;
+	/* now trim the length of the deivce to 0 if open was write-only */
+	if ((filp->f_flags & O_ACCMODE) == O_WRONLY) {
+		if (down_interruptible(&dev->sem))
+			return -ERESTARTSYS;
+
+		scull_trim(dev);
+		up(&dev->sem);
+	}
+	return 0;
 }
 
 int scull_release (struct inode *inode, struct file *filp)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -333,27 +338,27 @@ int scull_release (struct inode *inode, struct file *filp)
 */
 struct scull_qset *scull_follow(struct scull_dev *dev, int n)
 {
-    struct scull_qset *qs = dev->data;
-    /* allocate the first qset explicitly if need be */
-    if (!qs) {
-        qs = dev->data = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
-        if (qs == NULL)
-            return NULL;
-        memset(qs, 0, sizeof(struct scull_qset));
-    }
+	struct scull_qset *qs = dev->data;
+	/* allocate the first qset explicitly if need be */
+	if (!qs) {
+		qs = dev->data = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+		if (qs == NULL)
+			return NULL;
+		memset(qs, 0, sizeof(struct scull_qset));
+	}
 
-    /* then follow the list */
-    while (n--) {
-        if (!qs->next) {
-            qs->next = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
-            if (qs->next == NULL)
-                return NULL;
-            memset(qs->next, 0, sizeof(struct scull_qset));
-        }
-        qs = qs->next;
-        continue;
-    }
-    return qs;
+	/* then follow the list */
+	while (n--) {
+		if (!qs->next) {
+			qs->next = kmalloc(sizeof(struct scull_qset), GFP_KERNEL);
+			if (qs->next == NULL)
+				return NULL;
+			memset(qs->next, 0, sizeof(struct scull_qset));
+		}
+		qs = qs->next;
+		continue;
+	}
+	return qs;
 }
 
 /*
@@ -361,111 +366,115 @@ struct scull_qset *scull_follow(struct scull_dev *dev, int n)
  */
 ssize_t scull_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-    struct scull_dev *dev = filp->private_data;
-    struct scull_qset *dptr; /* the first listitem */
-    int quantum_size = dev->quantum; //bytes of a quantum
-    int qset_size = dev->qset;  //num of quantum of a quantum set
-    int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
-    int item, s_pos, q_pos, rest;
-    ssize_t retval = 0;
+	struct scull_dev *dev = filp->private_data;
+	struct scull_qset *dptr; /* the first listitem */
+	int quantum_size = dev->quantum; //bytes of a quantum
+	int qset_size = dev->qset;  //num of quantum of a quantum set
+	int item_size = quantum_size * qset_size; /* how many bytes in a listitem */
+	int item, s_pos, q_pos, rest;
+	ssize_t retval = 0;
 
-    if (down_interruptible(&dev->sem))
-        return -ERESTARTSYS;
-    if (*f_pos >= dev->size)
-        goto out;
-    if (*f_pos + count > dev->size)
-        count = dev->size - *f_pos;
+	if (down_interruptible(&dev->sem))
+		return -ERESTARTSYS;
 
-    /* find listitem, qset index, and offset in the quantum */
-    item = (long) *f_pos / item_size;// how many list items the current position is more than
-    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
-    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
-    q_pos = rest % quantum_size; //the last byte position in a quantum
-    
-    /* follow the list up to the right position (defined elsewhere) */
-    dptr = scull_follow(dev, item); // find the right list item
+	if (*f_pos >= dev->size)
+		goto out;
 
-    if (dptr == NULL || !dptr->data || !dptr->data[s_pos])
-        goto out;
+	if (*f_pos + count > dev->size)
+		count = dev->size - *f_pos;
 
-    /* read only up to the end of this quantum */
-    if (count > quantum_size - q_pos)
-        count = quantum_size - q_pos;
+	/* find listitem, qset index, and offset in the quantum */
+	item = (long) *f_pos / item_size;// how many list items the current position is more than
+	rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+	s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+	q_pos = rest % quantum_size; //the last byte position in a quantum
 
-    if (copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
-        retval = -EFAULT;
-        goto out;
-    }
-    *f_pos += count;
-    retval = count;
+	/* follow the list up to the right position (defined elsewhere) */
+	dptr = scull_follow(dev, item); // find the right list item
+
+	if (dptr == NULL || !dptr->data || !dptr->data[s_pos])
+		goto out;
+
+	/* read only up to the end of this quantum */
+	if (count > quantum_size - q_pos)
+		count = quantum_size - q_pos;
+
+	if (copy_to_user(buf, dptr->data[s_pos] + q_pos, count)) {
+		retval = -EFAULT;
+		goto out;
+	}
+	*f_pos += count;
+	retval = count;
 
 out:
-    up(&dev->sem);
-    return retval;
+	up(&dev->sem);
+	return retval;
 }
 
 ssize_t scull_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
 {
-    struct scull_dev *dev = filp->private_data;
-    struct scull_qset *dptr; /* the first listitem */
-    int quantum_size = dev->quantum; //bytes of a quantum
-    int qset_size = dev->qset;  //num of quantum of a quantum set
-    int item_size = quantum_size * qset_size; /* how many bytes in a listitem(quantum set) */
-    int item, s_pos, q_pos, rest;
-    ssize_t retval = -ENOMEM;
+	struct scull_dev *dev = filp->private_data;
+	struct scull_qset *dptr; /* the first listitem */
+	int quantum_size = dev->quantum; //bytes of a quantum
+	int qset_size = dev->qset;  //num of quantum of a quantum set
+	int item_size = quantum_size * qset_size; /* how many bytes in a listitem(quantum set) */
+	int item, s_pos, q_pos, rest;
+	ssize_t retval = -ENOMEM;
 
-    if (down_interruptible(&dev->sem))
-        return -ERESTARTSYS;
+	if (down_interruptible(&dev->sem))
+		return -ERESTARTSYS;
 
-    /* find listitem, qset index, and offset in the quantum */
-    item = (long) *f_pos / item_size;// how many list items the current position is more than
-    rest = (long) *f_pos % item_size;// the rest bytes in the last list item
-    s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
-    q_pos = rest % quantum_size; //the last byte position in a quantum
-    
-    /* follow the list up to the right position (defined elsewhere) */
-    dptr = scull_follow(dev, item); // find the right list item
+	/* find listitem, qset index, and offset in the quantum */
+	item = (long) *f_pos / item_size;// how many list items the current position is more than
+	rest = (long) *f_pos % item_size;// the rest bytes in the last list item
+	s_pos = rest / quantum_size; //the rest bytes can fully occupy s_pos quantuns
+	q_pos = rest % quantum_size; //the last byte position in a quantum
 
-    if (dptr == NULL)
-        goto out;
-    if (!dptr->data) {
-        /* an quantum set has qset_size quantums*/
-        dptr->data = kmalloc(qset_size * sizeof(char*), GFP_KERNEL);
-        if (!dptr->data)
-            goto out;
-        memset(dptr->data, 0, qset_size * sizeof(char*));
-    }
+	/* follow the list up to the right position (defined elsewhere) */
+	dptr = scull_follow(dev, item); // find the right list item
+	if (dptr == NULL)
+		goto out;
 
-    if (!dptr->data[s_pos]) {
-        /* each quantum has quantum_size bytes */
-        dptr->data[s_pos] = kmalloc(quantum_size, GFP_KERNEL);
-        if (!dptr->data[s_pos])
-            goto out;
-    }
+	if (!dptr->data) {
+		/* an quantum set has qset_size quantums*/
+		dptr->data = kmalloc(qset_size * sizeof(char*), GFP_KERNEL);
+		if (!dptr->data)
+			goto out;
+		memset(dptr->data, 0, qset_size * sizeof(char*));
+	}
 
-    /* write only up to the end of this quantum */
-    if (count > quantum_size - q_pos)
-        count = quantum_size - q_pos;
+	if (!dptr->data[s_pos]) {
+		/* each quantum has quantum_size bytes */
+		dptr->data[s_pos] = kmalloc(quantum_size, GFP_KERNEL);
+		if (!dptr->data[s_pos])
+			goto out;
+	}
 
-    if (copy_from_user(dptr->data[s_pos] + q_pos, buf, count)) {
-        retval = -EFAULT;
-        goto out;
-    }
-    *f_pos += count;
-    retval = count;
+	/* write only up to the end of this quantum */
+	if (count > quantum_size - q_pos)
+		count = quantum_size - q_pos;
 
-    /* update the size */
-    if (dev->size < *f_pos)
-        dev->size = *f_pos;
+	if (copy_from_user(dptr->data[s_pos] + q_pos, buf, count)) {
+		retval = -EFAULT;
+		goto out;
+	}
+
+	*f_pos += count;
+	retval = count;
+
+	/* update the size */
+	if (dev->size < *f_pos)
+		dev->size = *f_pos;
+
 out:
-    up(&dev->sem);
-    return retval;
+	up(&dev->sem);
+	return retval;
 }
 
 static void faulty_write(void)
 {
-    PDEBUG("this is oops test by scull ioctrl. not an issue.\n");
-    *(int*)0 = 0;
+	PDEBUG("this is oops test by scull ioctrl. not an issue.\n");
+	*(int*)0 = 0;
 }
 
 /*
@@ -487,25 +496,25 @@ static void faulty_write(void)
 long scull_ioctl(struct file *filp,
         unsigned int cmd, unsigned long arg)
 {
-    int retval = 0;
-    if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
-        return -ENOTTY;
+	int retval = 0;
+	if (_IOC_TYPE(cmd) != SCULL_IOC_MAGIC)
+		return -ENOTTY;
 
-    if (_IOC_NR(cmd) > SCULL_IOC_MAX)
-        return -ENOTTY;
+	if (_IOC_NR(cmd) > SCULL_IOC_MAX)
+		return -ENOTTY;
 
-    PDEBUG("cmd 0x%08x.\n", cmd);
-    switch(cmd) {
-        case SCULL_IOC_MAKE_FAULTY_WRITE:
-            faulty_write();
-            break;
+	PDEBUG("cmd 0x%08x.\n", cmd);
+	switch(cmd) {
+	case SCULL_IOC_MAKE_FAULTY_WRITE:
+		faulty_write();
+		break;
 
-        default:
-            PDEBUG("unknown cmd 0x%08x.\n", cmd);
-            break;
-    }
+	default:
+		PDEBUG("unknown cmd 0x%08x.\n", cmd);
+		break;
+	}
 
-    return retval;
+	return retval;
 }
 struct file_operations scull_fops = {
 	.owner =    THIS_MODULE,
@@ -524,24 +533,24 @@ struct file_operations scull_fops = {
  */
 void scull_cleanup_module(void)
 {
-    int i;
-    dev_t devno = MKDEV(scull_major, scull_minor);
+	int i;
+	dev_t devno = MKDEV(scull_major, scull_minor);
 
-    /* Get rid of our char dev entries */
-    if (scull_devices) {
-        for (i=0; i < scull_nr_devs; i++) {
-            scull_trim(scull_devices + i);
-            cdev_del(&scull_devices[i].cdev);
-        }
-        kfree(scull_devices);
-    }
+	/* Get rid of our char dev entries */
+	if (scull_devices) {
+		for (i=0; i < scull_nr_devs; i++) {
+			scull_trim(scull_devices + i);
+			cdev_del(&scull_devices[i].cdev);
+		}
+		kfree(scull_devices);
+	}
 #ifdef SCULL_DEBUG
-    scull_remove_proc();
+	scull_remove_proc();
 #endif
 
-    /* cleanup_module is never called if registering failed */
-    unregister_chrdev_region(devno, scull_nr_devs);
-    printk(KERN_WARNING "scull exit, major %d\n", scull_major);
+	/* cleanup_module is never called if registering failed */
+	unregister_chrdev_region(devno, scull_nr_devs);
+	printk(KERN_WARNING "scull exit, major %d\n", scull_major);
 }
 
 /*
