@@ -6,6 +6,7 @@
 #include <linux/seq_file.h>
 #include <linux/timer.h>
 
+/* JIT stands for "Just In Time" */
 #define JIT_CURRENT_TIME "currentime"
 
 /*
@@ -18,18 +19,26 @@ int jit_currentime_show(struct seq_file *m, void *v)
 	unsigned long j1;
 	u64 j2;
 
-	/* get them four */
+/*
+ * The counter is initialized to 0 at system boot, so it represents the
+ * number of clock ticks since last boot. The counter is a 64-bit
+ * variable (even on 32-bit architectures) and is called jiffies_64.
+ * However, driver writers normally access the jiffies variable, an
+ * unsigned long that is the same as either jiffies_64 or its least
+ * significant bits. Using jififes is usually preferred bacause it is
+ * faster, and access to the 64-bit jiffies_64 value are not necessary
+ * atomic on 32-bit architectures).
+ */
 	j1 = jiffies;
 	j2 = get_jiffies_64();
 	do_gettimeofday(&tv1);
 	tv2 = current_kernel_time();
 
 	/* print */
-	seq_printf(m, "jiffies 0x%08lx, jiffies_64 0x%016Lx, do_gettimeofday %10i.%06i"
-		       "current_kernel_time %40i.%09i\n",
-		       j1, j2,
-		       (int) tv1.tv_sec, (int) tv1.tv_usec,
-		       (int) tv2.tv_sec, (int) tv2.tv_nsec);
+	seq_printf(m, "jiffies\t\t 0x%016lx, do_gettimeofday\t\t %10i.%06i\n"
+		       "jiffies_64\t 0x%016Lx, current_kernel_time\t %10i.%09i\n",
+		       j1, (int) tv1.tv_sec, (int) tv1.tv_usec,
+		       j2, (int) tv2.tv_sec, (int) tv2.tv_nsec);
 	return 0;
 }
 
