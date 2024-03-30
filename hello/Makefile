@@ -11,6 +11,7 @@ ifeq ($(KERNELRELEASE),)
     KERNELDIR ?= /lib/modules/$(shell uname -r)/build
     # The current directory is passed to sub-makes as argument
     PWD := $(shell pwd)
+    $(info "KERNELRELEASE is NULL, first enter")
 
 modules:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
@@ -24,6 +25,7 @@ clean:
 .PHONY: modules modules_install clean
 
 else
+    $(info KERNELRELEASE is $(KERNELRELEASE), second enter)
     # called from kernel build system: just declare what our modules are
     obj-m := hello.o
 endif
