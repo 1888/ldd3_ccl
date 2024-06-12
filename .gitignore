@@ -11,3 +11,4 @@
 *.order
 *.symvers
 *.cache.mk
+*.vscode
